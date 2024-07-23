@@ -7,7 +7,7 @@ const cors = require('cors')
 const bodyparser = require('body-parser')
 require('dotenv').config();
 require('express-async-errors')
-
+const PORT = process.env.PORT || 3000
 
 app.use(cors())
 app.use(bodyparser.json())
@@ -31,7 +31,7 @@ app.use(require('./middleware/errorMiddleware'))
 const start = async ()=>{
     try {
         await connectMongoDB(process.env.MONGO_DB_URL)
-        app.listen(3000,()=>{  console.log(`App is running on port 3000`)});
+        app.listen(PORT,()=>{  console.log(`App is running on port ${PORT}`)});
     } catch (error) {
         console.log(error)
     }
