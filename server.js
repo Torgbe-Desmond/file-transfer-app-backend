@@ -22,6 +22,8 @@ app.use('/api/v1', require('./routes/directory.routes'))
 //files route
 app.use('/api/v1', require('./routes/files.routes'))
 
+//comment route
+app.use('/api/v1', require('./routes/commnent.routes'))
 
 //custom middleware
 app.use(require('./middleware/notFound'))
