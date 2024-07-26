@@ -3,7 +3,7 @@ const { getComment } = require('../controllers/controller.comment/getComments')
 const router = require('express').Router()
 const ProtectStudentRoute = require('../middleware/studentProtectRoute')
 
-router.route('/:reference_Id/send').post(ProtectStudentRoute,createComment)
-router.route('/:reference_Id/:directoryId/get-comment').get(ProtectStudentRoute,getComment)
+router.post('/:reference_Id/send',ProtectStudentRoute,createComment)
+router.get('/:reference_Id/:directoryId/get-comment',ProtectStudentRoute,getComment)
 
 module.exports = router;
