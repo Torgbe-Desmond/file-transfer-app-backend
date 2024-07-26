@@ -6,6 +6,4 @@ const ProtectStudentRoute = require('../middleware/studentProtectRoute')
 router.route('/:reference_Id/send').post(ProtectStudentRoute,createComment)
 router.route('/:reference_Id/:directoryId/get-comment').get(ProtectStudentRoute,getComment)
 
-
-
 module.exports = router;
