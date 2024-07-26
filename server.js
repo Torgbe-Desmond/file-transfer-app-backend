@@ -23,7 +23,7 @@ app.use('/api/v1', require('./routes/directory.routes'))
 app.use('/api/v1', require('./routes/files.routes'))
 
 //comment route
-app.use('/api/v1', require('./routes/commnent.routes'))
+app.use('/api/v1/messages', require('./routes/commnent.routes'))
 
 //custom middleware
 app.use(require('./middleware/notFound'))
