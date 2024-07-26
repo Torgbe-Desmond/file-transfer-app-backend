@@ -4,7 +4,7 @@ const {
     StatusCodes,
     mongoose,
     Comment
-} = require('./configurations');
+} = require('../controller.directory/configurations');
 
 
 module.exports.createComment = expressAsyncHandler(async (req, res) => {
@@ -25,7 +25,7 @@ module.exports.createComment = expressAsyncHandler(async (req, res) => {
         await directoryExist.save({session});
 
         await session.commitTransaction()
-        res.status(StatusCodes.OK).json(editedSpecificDirectoryExist);
+        res.status(StatusCodes.OK).json({message:'Message created succesfully'});
         
     } catch (error) {
         await session.abortTransaction();

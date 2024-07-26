@@ -4,7 +4,7 @@ const {
     StatusCodes,
     mongoose,
     Comment
-} = require('./configurations');
+} = require('../controller.comment/configurations');
 
 
 module.exports.getComment = expressAsyncHandler(async (req, res) => {
