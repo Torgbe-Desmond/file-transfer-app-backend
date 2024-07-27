@@ -12,7 +12,7 @@ const { subscribeToSubscription } = require('../controllers/controller.directory
 const { createDirectory } = require('../controllers/controller.directory/createDirectory')
 const { getStudentDirectory } = require('../controllers/controller.directory/getStudentDirectory')
 const { getStudentMainDirectory } = require('../controllers/controller.directory/getStudentMainDirectory')
-const { studentProtectRoutes } = require('../middleware/studentProtectRoute')
+const studentProtectRoutes = require('../middleware/studentProtectRoute')
 
 
 router.get('/:reference_Id/directories',protectRoutes,getAllDirectories)
@@ -38,5 +38,7 @@ router.get('/:reference_Id/sharing/:directoryId/sub',protectRoutes,getSubscripti
 router.post('/:reference_Id/renameDirectory',protectRoutes,renameDirectory)
 
 router.post('/subscribe',protectRoutes,subscribeToSubscription)
+
+
 
 module.exports = router;

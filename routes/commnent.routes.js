@@ -1,9 +1,11 @@
-const { createComment } = require('../controllers/controller.comment/createComment')
-const { getComment } = require('../controllers/controller.comment/getComments')
 const router = require('express').Router()
-const ProtectStudentRoute = require('../middleware/studentProtectRoute')
+const { createNewComment } = require('../controllers/controller.comment/createNewMessage')
+const { getAllComments } = require('../controllers/controller.comment/getAllComments')
+const studentProtectRoutes = require('../middleware/studentProtectRoute')
+const protectRoutes = require('../middleware/protectRoutes')
 
-router.post('/send',ProtectStudentRoute,createComment)
-router.get('/:directoryId/get-comment',ProtectStudentRoute,getComment)
+
+router.post('/:reference_Id/send',studentProtectRoutes,createNewComment)
+router.get('/:reference_Id/:directoryId/get-comment',protectRoutes,getAllComments)
 
 module.exports = router;
