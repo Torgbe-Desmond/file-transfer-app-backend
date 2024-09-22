@@ -35,3 +35,35 @@ Stores file details like originalname, url, directoryId, user_id, mimetype, and 
 5. Comment
 Allows users to add comments on specific directories.
 
+API Endpoints
+Authentication Routes
+Method	Endpoint	Description	Protected
+POST	/auth/login	Logs in a user	No
+POST	/auth/register	Registers a new user	No
+POST	/auth/student-login	Logs in a student	No
+POST	/auth/delete	Deletes a user	Yes
+GET	/auth/recovery	Sends account recovery email	No
+POST	/auth/forgot-password	Sends a forgot password link	Yes
+GET	/auth/all	Fetches all users	No
+Comment Routes
+Method	Endpoint	Description	Protected
+POST	/comment/:reference_Id/send	Adds a new comment	Yes
+GET	/comment/:reference_Id/:directoryId/get-comment	Fetches all comments for a specific directory	Yes
+Directory Routes
+Method	Endpoint	Description	Protected
+GET	/directory/:reference_Id/directories	Retrieves all directories	Yes
+GET	/directory/student/:reference_Id/directories	Retrieves the student's main directory	Yes
+POST	/directory/:reference_Id/directories/:directoryId	Creates a new directory in the specified folder	Yes
+GET	/directory/:reference_Id/directories/all	Retrieves all directories available for moving files	Yes
+DELETE	/directory/delete-directory	Deletes a specific directory	Yes
+GET	/directory/:reference_Id/directories/:directoryId	Retrieves a specific directory by ID	Yes
+GET	/directory/student/:reference_Id/directories/:directoryId	Fetches a student's directory by ID	Yes
+POST	/directory/:reference_Id/moveDirectories	Moves directories	Yes
+POST	/directory/:reference_Id/renameDirectory	Renames a directory	Yes
+File Routes
+Method	Endpoint	Description	Protected
+POST	/file/:reference_Id/directories/:directoryId/stuff	Uploads files to a directory	Yes
+DELETE	/file/delete-files	Deletes specific files	Yes
+GET	/file/:reference_Id/stuff	Fetches all files for a user	Yes
+POST	/file/:reference_Id/movefiles	Moves files between directories	Yes
+GET	/file/download/:fileId	Downloads a file	Yes

@@ -10,10 +10,9 @@ const studentSchema = new Schema({
   interfaceId:{type:Schema.Types.ObjectId, ref:'PrivateInterface'},
   role:{ type: String , default: 'Student' },
 }, {
-  timestamps: true // Adds createdAt and updatedAt fields
+  timestamps: true 
 });
 
-// Indexing for frequently queried fields
 studentSchema.index({ studentName: 1 });
 studentSchema.index({ referenceId: 1 });
 
