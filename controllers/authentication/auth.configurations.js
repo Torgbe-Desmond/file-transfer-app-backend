@@ -10,7 +10,7 @@ const { deleteDirectoryRecursive } = require('../../utils/index.js');
 const User = require('../../models/user.js');
 const UserSubscriptions = require('../../models/subscriptionsOfUser.js');
 const Student = require('../../models/student.js')
-const Courses = require('../../models/courses.js')
+// const Courses = require('../../models/courses.js')
 
 module.exports = {
     bcryptjs,
@@ -26,6 +26,5 @@ module.exports = {
     User,
     UserSubscriptions,
     Student,
-    Courses
 };
 

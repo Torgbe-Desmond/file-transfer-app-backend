@@ -1,4 +1,4 @@
-const { Directory, mongoose,asyncHandler ,StatusCodes} = require('./auth.configurations')
+const { Directory, mongoose,asyncHandler} = require('./auth.configurations')
 
 module.exports.deleteUSer = asyncHandler(async(req,res)=>{
     const user_id = req.user
