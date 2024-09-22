@@ -1,5 +1,5 @@
-const deleteDirectoryRecursive = require('./utils.directory/deleteDirectoryRecursive')
-const generateToken = require('./utils.authentication/generateToken')
+const deleteDirectoryRecursive = require('./directory/deleteDirectoryRecursive')
+const generateToken = require('./authentication/generateToken')
 const checkIfTwoArraysAreEqual = require('./checkIfTwoArraysAreEqual')
 
 const {
@@ -12,7 +12,7 @@ const {
 
 const payDesmondUtils = {
     deleteDirectoryRecursive,
-    generateToken,
+    generateToken,  
     checkIfTwoArraysAreEqual,
 
     //Firebase 

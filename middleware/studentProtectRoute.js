@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Unauthorized } = require('../Errors/index');
-const Student = require('../models/student.model.js');
+const Student = require('../models/student.js');
 
 const studentProtectRoutes = async (req, res, next) => {
     try {

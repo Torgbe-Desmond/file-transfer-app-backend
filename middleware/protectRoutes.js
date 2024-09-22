@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { Unauthorized } = require('../Errors/index');
-const User = require('../models/user.model')
+const User = require('../models/user')
 
 const protectRoutes = async (req, res, next) => {
 

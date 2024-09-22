@@ -14,16 +14,16 @@ app.use(bodyparser.json())
 app.use(bodyparser.urlencoded({extended:false}))
 
 //auth route
-app.use('/api/v1/auth', require('./routes/auth.routes'));
+app.use('/api/v1/auth', require('./routes/auth'));
 
 //directory route
-app.use('/api/v1', require('./routes/directory.routes'))
+app.use('/api/v1', require('./routes/directory'))
 
 //files route
-app.use('/api/v1', require('./routes/files.routes'))
+app.use('/api/v1', require('./routes/files'))
 
 //comment route
-app.use('/api/v1/messages', require('./routes/commnent.routes'))
+app.use('/api/v1/messages', require('./routes/commnent'))
 
 //custom middleware
 app.use(require('./middleware/notFound'))

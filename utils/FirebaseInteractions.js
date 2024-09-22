@@ -1,5 +1,5 @@
 const firebase = require('firebase/app');
-const File = require('../models/files.model');
+const File = require('../models/files');
 const admin = require("firebase-admin");
 const fs = require('fs');
 require('dotenv').config();
@@ -14,7 +14,7 @@ const {
 }= require('firebase/storage');
 
 const { NotFound } = require('../Errors');
-const Directory = require('../models/directory.model');
+const Directory = require('../models/directory');
 
 
 
