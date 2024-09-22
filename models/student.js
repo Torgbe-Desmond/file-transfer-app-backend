@@ -9,7 +9,6 @@ const studentSchema = new Schema({
   studentLink: {type:Schema.Types.ObjectId, ref:'Directory',required:true},
   interfaceId:{type:Schema.Types.ObjectId, ref:'PrivateInterface'},
   role:{ type: String , default: 'Student' },
-  courses: [{ type: Schema.Types.ObjectId, ref: 'Courses' }],
 }, {
   timestamps: true // Adds createdAt and updatedAt fields
 });
