@@ -4,7 +4,6 @@ const Directory = require('../../models/directory');
 const File = require('../../models/files');
 const { StatusCodes } = require("http-status-codes");
 const mongoose = require('mongoose');
-const payDesmondUtils = require('../../utils/index');
 const { uploadFileToGroup, uploadFileToStorage } = require("../../utils/FirebaseInteractions");
 const { NotFound } = require("../../Errors");
 const handleFileCreation = require("../../utils/file/handleFileCreation");

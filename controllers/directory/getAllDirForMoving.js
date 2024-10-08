@@ -2,32 +2,40 @@ const {
     expressAsyncHandler,
     Directory,
     StatusCodes,
+    NotFound,
 } = require('./configurations');
-
 
 module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
     const parentDirectory = req.params.reference_Id;
 
-    console.log('reference_Id',parentDirectory)
-
     try {
-        const directoriesOfUser = await Directory.find({parentDirectory});
-        
-        let user_id = directoriesOfUser[0].user_id;
-  
-        let allDirectories = await Directory.find({user_id})
+        // Get directories associated with the specified parent directory
+        const directoriesOfUser = await Directory.find({ parentDirectory });
 
-        let editedAllDirectories = allDirectories.reduce((acc,value)=>{
-                const { _id,name,mimetype,subDirectories} = value;
+        // Check if any directories were found
+        if (!directoriesOfUser.length) {
+            throw new NotFound('No directories found for the specified parent directory.')
+        }
 
-                acc.push({ _id,name,mimetype,subDirectories})
+        // Extract user ID from the first directory found
+        const user_id = directoriesOfUser[0].user_id;
 
-                return acc;
-        },[])
+        // Get all directories belonging to the same user
+        const allDirectories = await Directory.find({ user_id });
 
-        res.status(StatusCodes.OK).json( editedAllDirectories );
+        // Map over the directories to create a formatted response
+        const editedAllDirectories = allDirectories.map(({ _id, name, mimetype, subDirectories }) => ({
+            _id,
+            name,
+            mimetype,
+            subDirectories,
+        }));
+
+        // Send the formatted directories in the response
+        res.status(StatusCodes.OK).json(editedAllDirectories);
 
     } catch (error) {
+        // Handle unexpected errors
         throw error;
     }
 });

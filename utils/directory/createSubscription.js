@@ -7,11 +7,9 @@ const { createDirectory: createNewDirectory } = require('../../utils/directory/c
 module.exports.createSubscription = async ({
     name,
     session,
-    Directory,
     user_id,
     parentDirectory,
     excelFile,
-    courses,
     directoryExist
 }) => {
         let room;
@@ -25,7 +23,7 @@ module.exports.createSubscription = async ({
                 mimetype: 'Subscription',
             })
 
-            createPrivateStudent(excelFile, room[0]._id, courses, session);
+            createPrivateStudent(excelFile, room[0]._id);
 
         } else {        
 

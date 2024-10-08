@@ -3,7 +3,6 @@ const {
     expressAsyncHandler,
     Directory,
     StatusCodes,
-    mongoose,
 } = require('./configurations');
 
 
