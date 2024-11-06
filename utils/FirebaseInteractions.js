@@ -33,9 +33,9 @@ firebase.initializeApp(firebaseConfig);
 const storage = getStorage(); // Get the storage service
 
 // Function to upload a file to Firebase Storage for a user
-const uploadFileToStorage = async (user_id, file, originalname) => {
+const uploadFileToStorage = async (user_id, file) => {
     try {
-        const { mimetype, buffer } = file; // Destructure the file to get its mimetype and buffer
+        const { mimetype, buffer, originalname } = file; // Destructure the file to get its mimetype and buffer
         const storageRef = ref(storage, `users/${user_id}/${originalname}`); // Create a reference to the storage location
         const metadata = {
             contentType: mimetype // Set the content type for the uploaded file
@@ -67,6 +67,24 @@ const uploadFileToGroup = async (user_id, file, originalname) => {
         throw error; // Throw error if upload fails
     }
 };
+
+const uploadMultipleFilesToGroup = async (user_id, files) => {
+    try {
+        const uploadPromises = files.map(file => {
+            const { originalname, mimetype, buffer } = file;
+            return uploadFileToStorage(user_id, { originalname, mimetype, buffer });
+        });
+        
+        // Wait for all files to upload and get their URLs
+        const fileUrls = await Promise.all(uploadPromises);
+        return fileUrls;
+    } catch (error) {
+        console.error('Error uploading multiple files:', error);
+        throw error;
+    }
+};
+
+
 
 // Function to delete a file from Firebase Storage
 const deleteFileFromStorage = async (user_id, filename) => {
@@ -166,6 +184,7 @@ module.exports = {
     downloadFileFromStorage,
     deleteFilesInDirectory,
     deleteFileFromStorage,
+    uploadMultipleFilesToGroup,
     updateImage,
     uploadFileToGroup,
     admin

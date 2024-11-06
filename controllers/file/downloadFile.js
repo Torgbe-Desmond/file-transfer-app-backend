@@ -20,10 +20,10 @@ module.exports.downloadFile = expressAsyncHandler(async (req, res) => {
         }
 
         // Destructure the relevant properties from the found file object
-        const { url, originalname, size } = file;
+        const { url, name, size } = file;
         
         // Create a new object to hold the file's URL and original name
-        const fileObject = { url, originalname, size };
+        const fileObject = { url, name, size };
         
         // Send the file object back to the client as a response
         res.send(fileObject);

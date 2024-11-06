@@ -13,7 +13,6 @@ const {
 module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
     // Extract file IDs and directory ID from the request body
     const { fileIds, directoryId } = req.body;
-    console.log(fileIds, directoryId)
     const user_id = req.user; // Get the user ID from the request
 
     // Start a new Mongoose session for transaction management

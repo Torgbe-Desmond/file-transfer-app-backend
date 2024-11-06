@@ -29,8 +29,6 @@ module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
             label:name
         }));
 
-        console.log(editedAllDirectories)
-
         // Send the formatted directories in the response
         res.status(StatusCodes.OK).json(editedAllDirectories);
 

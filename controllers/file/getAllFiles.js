@@ -13,9 +13,9 @@ module.exports.getAllFiles = expressAsyncHandler(async (req, res) => {
         throw new NotFound('No files found for the user');
     }
     const allFiles = userFiles.map(item => {
-    const {_id, directoryId, originalname, url } = item;
+    const {_id, directoryId, name, url } = item;
     return {
-        name: originalname,
+        name,
         _id,
         mimetype,
         size,

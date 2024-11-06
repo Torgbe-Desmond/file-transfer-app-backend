@@ -23,12 +23,12 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
     }) || [];
   
     const specificFilesExist = data?.files?.map((value) => {
-      const { _id, directoryId, originalname, mimetype, url, size, user_id, lastUpdated } = value;
+      const { _id, directoryId, name, mimetype, url, size, user_id, lastUpdated } = value;
   
       return {
         _id,
         parentDirectory: directoryId,
-        name: originalname,
+        name,
         url,
         mimetype,
         size,

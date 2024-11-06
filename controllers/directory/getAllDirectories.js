@@ -18,10 +18,6 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
         throw new NotFound('No directories found f  or this reference ID.')
       }
 
-      const getAllUserDirectoryIds = allDirectories.reduce((acc,{_id})=>{
-          acc.push(_id);
-          return acc;
-      },[])
 
       // Map over the directories to create a formatted response
       const editedAllDirectories = allDirectories.map(({ _id, parentDirectory, name, mimetype, lastUpdated, subDirectories, files, privateDirectory }) => {
@@ -38,8 +34,6 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
               files
           };
       });
-
-      console.log(editedAllDirectories)
 
       // Send the formatted directories in the response
       res.status(StatusCodes.OK).json(editedAllDirectories)

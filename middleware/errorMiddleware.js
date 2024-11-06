@@ -16,7 +16,20 @@ const errorMiddleware = (err,req,res,next)=>{
             createCustomError.message = 'Your token is invalid'
         }
 
-        console.log('error message',err.message)
+        let errorDetails
+        if (err.name === 'ValidationError') {
+            const errors = err.errors;
+             errorDetails = Object.keys(errors).map(key => ({
+                field: key,
+                message: errors[key].message,
+                type: errors[key].kind 
+          }));
+
+          createCustomError.message = errorDetails[0].message
+          createCustomError.statusCode = StatusCodes.BAD_REQUEST;    
+    
+        }
+
         res.status(createCustomError.statusCode).json({message:err.message})
 
 }
