@@ -10,7 +10,8 @@ module.exports.createSubscription = async ({
     user_id,
     parentDirectory,
     excelFile,
-    directoryExist
+    directoryExist,
+    session
 }) => {
         let room;
         if(excelFile){
@@ -23,7 +24,7 @@ module.exports.createSubscription = async ({
                 mimetype: 'Subscription',
             })
 
-            createPrivateStudent(excelFile, room[0]._id);
+            createPrivateStudent({excelFile,parentDirectory:room[0]._id});
 
         } else {        
 

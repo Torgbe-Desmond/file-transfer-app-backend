@@ -1,38 +1,48 @@
-const { User, mongoose, bcryptjs,asyncHandler,StatusCodes } = require("./auth.configurations");
+const { User, mongoose, bcryptjs, asyncHandler, StatusCodes, BadRequest } = require("./auth.configurations");
 
+module.exports.forgotPassword = asyncHandler(async (req, res) => {
+  // Retrieve the user ID from the authenticated request
+  const user_id = req.user;
 
-module.exports.forgotPassword = asyncHandler(async (req,res)=>{
-    const user_id = req.user
-    const session = await mongoose.startSession();
-    session.startTransaction()
+  // Start a MongoDB session for transaction handling
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
+  try {
+    // Extract the password from the request body
+    const { password } = req.body;
+
+    // Ensure the password is provided
+    if (!password) throw new BadRequest('Please provide a password');
+
+    // Find the user by the user ID (from the authenticated request)
+    const userExist = await User.findById(user_id);
+
+    // If the user is not found, throw a BadRequest error
+    if (!userExist) throw new BadRequest('No such user');
+
+    // Hash the new password using bcrypt
+    const hashedPassword = await bcryptjs.hash(password, 10);
+
+    // Update the user's password with the hashed password within the session
+    await User.findByIdAndUpdate(
+      user_id, 
+      { password: hashedPassword }, 
+      { session }
+    );
+
+    // Commit the transaction once the update is successful
+    await session.commitTransaction();
+
+    // Respond with a success message
+    res.status(StatusCodes.OK).json({ message: 'Password update was successful' });
     
-    try {
-      
-      const _id = req.user;
-  
-      const {password} = req.body;
-    
-      const userExist = await User.findById(_id)
-  
-      if(!userExist) throw new BadRequest('No such user');
-  
-      const hashedPassword = await bcryptjs.hash(password, 10);
-      
-      await User.findBydIdAndUpdate(_id,{password:hashedPassword},{session})
-  
-      const updateInfo = {message:'Update was successful'}
-  
-      await session.commitTransaction();
-  
-      res.status(StatusCodes.OK).json(updateInfo)
-  
-    } catch (error) {
-      session.abortTransaction();
-      throw error;
-    } finally {
-      session.endSession();
-  
-    }
-         
-  });
-  
+  } catch (error) {
+    // If an error occurs, abort the transaction
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    // End the session
+    session.endSession();
+  }
+});

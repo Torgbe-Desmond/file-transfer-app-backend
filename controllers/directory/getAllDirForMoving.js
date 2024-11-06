@@ -24,12 +24,12 @@ module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
         const allDirectories = await Directory.find({ user_id });
 
         // Map over the directories to create a formatted response
-        const editedAllDirectories = allDirectories.map(({ _id, name, mimetype, subDirectories }) => ({
-            _id,
-            name,
-            mimetype,
-            subDirectories,
+        const editedAllDirectories = allDirectories.map(({ _id, name}) => ({
+            path:_id,
+            label:name
         }));
+
+        console.log(editedAllDirectories)
 
         // Send the formatted directories in the response
         res.status(StatusCodes.OK).json(editedAllDirectories);

@@ -10,6 +10,7 @@ const {
 module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
   const { _id, name } = req.body;
 
+  console.log( _id, name)
   // Input validation
   if (!_id || !name) {
       throw new BadRequest('Directory ID and new name must be provided.');

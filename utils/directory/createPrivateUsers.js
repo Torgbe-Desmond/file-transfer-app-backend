@@ -4,7 +4,7 @@ const Student = require('../../models/student');
 const asyncHandler = require('express-async-handler');
 const { v4: uuidv4 } = require('uuid');
 
-module.exports.createPrivateStudent = asyncHandler(async ({excelFile, parentDirectory,session}) => {
+ const privateStudentDir = asyncHandler(async ({excelFile, parentDirectory,session}) => {
     let privateStudent = [];
 
     try {
@@ -12,18 +12,16 @@ module.exports.createPrivateStudent = asyncHandler(async ({excelFile, parentDire
             if (!indexNumber && !studentNumber && !studentName) {
                 continue;
             }
-
-            const indexNumberStr = indexNumber.toString();
-            const hashedIndexNumber = await hashedPassword(indexNumberStr);
-            const reference_Id = uuidv4();
-
-            const newStudent = await Student.create([{
+            // Create student object
+            const newStudentObject =  {
                 studentName: studentName.split(' ')[1],
-                indexNumber: hashedIndexNumber,        
+                indexNumber: await hashedPassword(indexNumber.toString()),        
                 studentNumber: studentNumber.toString(),
-                reference_Id,                          
+                reference_Id : uuidv4(),                          
                 studentLink: parentDirectory            
-            }], { session: transactionSession });      
+            }
+
+            const newStudent = await Student.create([newStudentObject], { session });      
 
             privateStudent.push(newStudent);
         }
@@ -37,3 +35,6 @@ module.exports.createPrivateStudent = asyncHandler(async ({excelFile, parentDire
         session.endSession();
     }
 });
+
+
+module.exports = privateStudentDir;

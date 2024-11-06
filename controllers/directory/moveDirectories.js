@@ -14,45 +14,57 @@ module.exports.moveDirectories = expressAsyncHandler(async (req, res) => {
     session.startTransaction();
 
     try {
-       if (directoryToMoveTo.length !== 1) {
+        // Validate input
+        if (!Array.isArray(directoriesToMove) || directoriesToMove.length === 0) {
+            throw new BadRequest('No directories specified to move.');
+        }
+
+        if (directoryToMoveTo.length !== 1) {
             throw new BadRequest('There should be exactly one target directory to move the directories into.');
         }
 
         const targetDirectoryId = directoryToMoveTo[0];
 
-        let moveDirectories = []
-
-        for (const directoryId of directoriesToMove) {
-            await Directory.findOneAndUpdate(
-                { _id: directoryId },
-                { parentDirectory: targetDirectoryId },
-                { session }
-            );
-        
-            const removeFromParentDirectory = await Directory.findById(directoryId);
-        
-            const findParentDirectory = await Directory.findById(removeFromParentDirectory.parentDirectory);
-            if (findParentDirectory) {
-                findParentDirectory.subDirectories.pull(directoryId);
-                await findParentDirectory.save({ session });
-            }
-        
-            moveDirectories.push(directoryId);
-        }
-
+        // Check if the target directory exists
         const targetDirectory = await Directory.findById(targetDirectoryId).session(session);
         if (!targetDirectory) {
             throw new NotFound('Target directory not found.');
         }
 
+        // Fetch directories to move
+        const directories = await Directory.find({ _id: { $in: directoriesToMove } }).session(session);
+        if (directories.length !== directoriesToMove.length) {
+            throw new NotFound('One or more directories to move were not found.');
+        }
 
-        targetDirectory.subDirectories.push(...directoriesToMove);
+        let moveDirectories = [];
+
+        for (const directory of directories) {
+            // Update parent directory for the current directory
+            await Directory.findOneAndUpdate(
+                { _id: directory._id },
+                { parentDirectory: targetDirectoryId },
+                { session }
+            );
+
+            // Remove from the old parent directory
+            const parentDirectory = await Directory.findById(directory.parentDirectory).session(session);
+            if (parentDirectory) {
+                parentDirectory.subDirectories.pull(directory._id);
+                await parentDirectory.save({ session });
+            }
+
+            moveDirectories.push(directory._id);
+        }
+
+        // Add moved directories to the target directory
+        targetDirectory.subDirectories.push(...moveDirectories);
         await targetDirectory.save({ session });
 
         await session.commitTransaction();
         res.status(StatusCodes.CREATED).json(moveDirectories);
 
-    } catch (error) {   
+    } catch (error) {
         await session.abortTransaction();
         throw error;
     } finally {

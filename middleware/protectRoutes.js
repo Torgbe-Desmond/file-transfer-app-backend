@@ -7,11 +7,12 @@ const protectRoutes = async (req, res, next) => {
     try {
 
         const header = req.headers.authorization;
-        if (!header || !header.startsWith('Bearer')){
+        if (!header || !header.startsWith('Bearer ')){
+            console.log(1)
             throw new Unauthorized('Unauthorized');
         }
 
-        const token = header.split(' ')[1];
+        const token = JSON.parse(header.split(' ')[1]);
         const decoded = jwt.verify(token, process.env.JWT_KEY);
 
         if (!decoded._id){
@@ -19,10 +20,9 @@ const protectRoutes = async (req, res, next) => {
         }
 
         const user = await User.findOne({_id:decoded._id})
-
-        console.log('user',user)
           
         if (!user){
+            console.log(3)
             throw new Unauthorized('Unauthorized');
         }
 
@@ -33,7 +33,7 @@ const protectRoutes = async (req, res, next) => {
     }
      
     catch (error){
-        next(error); 
+        throw new Unauthorized('Unauthorized');
     }
 };
 

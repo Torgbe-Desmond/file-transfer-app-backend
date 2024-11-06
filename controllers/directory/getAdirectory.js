@@ -3,8 +3,8 @@ const {
     expressAsyncHandler,
     Directory,
     StatusCodes,
+    NotFound,
 } = require('./configurations');
-
 module.exports.getAdirectory = expressAsyncHandler(async (req, res) => {
     try {
         // Extract the directory ID from the request parameters
@@ -18,15 +18,14 @@ module.exports.getAdirectory = expressAsyncHandler(async (req, res) => {
 
         // Check if the directory was found
         if (!data) {
-            return res.status(StatusCodes.NOT_FOUND).json({ message: 'Directory not found' });
+            throw new NotFound('Directory not found')
         }
+
 
         // Combine files and directories using the utility function
         const directoriesAndFiles = combinedFilesAndDirectories({ data });
-
         // Send the combined data as a response
-        res.status(StatusCodes.OK).json(directoriesAndFiles);
-                
+        res.status(StatusCodes.OK).json(directoriesAndFiles)               
     } catch (error) {
         // Handle any errors that occur during the process
         throw error;

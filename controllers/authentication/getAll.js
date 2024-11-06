@@ -1,8 +1,9 @@
-const { User,asyncHandler} = require("./auth.configurations");
-
-
+const { User, asyncHandler, StatusCodes } = require("./auth.configurations");
 
 module.exports.getAll = asyncHandler(async (req, res) => {
-    const allUsers = await User.find({})
-    res.status(StatusCodes.OK).json(allUsers)
-})
+  // Fetch all users from the database
+  const allUsers = await User.find({});
+
+  // Respond with the list of all users and a 200 OK status
+  res.status(StatusCodes.OK).json(allUsers);
+});

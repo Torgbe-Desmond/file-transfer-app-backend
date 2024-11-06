@@ -1,29 +1,34 @@
+// Import necessary modules and configurations
 const {
     expressAsyncHandler,
     File,
-    mongoose,
     NotFound,
 } = require('./configurations');
 
-
-// Middleware to delete a file
+// Middleware to handle file download requests
 module.exports.downloadFile = expressAsyncHandler(async (req, res) => {
+    // Extract the file ID from the request parameters
     const { fileId } = req.params;
-    const session = await mongoose.startSession();
-    session.startTransaction();
+
     try {
+        // Attempt to find the file in the database using the provided file ID
         const file = await File.findById(fileId).session(session);
+        
+        // If the file does not exist, throw a NotFound error
         if (!file) {
             throw new NotFound('File not found');
         }
-        const { url, originalname, name,size } = file;       
-        const fileObject = { url, originalname,size };
-        await session.commitTransaction(); 
+
+        // Destructure the relevant properties from the found file object
+        const { url, originalname, size } = file;
+        
+        // Create a new object to hold the file's URL and original name
+        const fileObject = { url, originalname, size };
+        
+        // Send the file object back to the client as a response
         res.send(fileObject);
     } catch (error) {
-        await session.abortTransaction();
+        // Rethrow any errors that occur during the execution
         throw error;
-    } finally {
-        session.endSession();
     }
 });

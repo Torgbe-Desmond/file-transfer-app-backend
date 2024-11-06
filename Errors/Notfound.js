@@ -6,7 +6,7 @@ class NotFound extends custom_error_handler{
         super(message)
         this.messaeg = message
         this.statusCodes = StatusCodes.NOT_FOUND
-    }
+    }   
 }
 
 module.exports = NotFound

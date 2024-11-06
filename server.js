@@ -1,42 +1,47 @@
 const express = require('express');
 const app = express();
-const {
-    connectMongoDB
-} = require('./db/db');
-const cors = require('cors')
-const bodyparser = require('body-parser')
+const { connectMongoDB } = require('./db/db');
+const cors = require('cors');
+const bodyparser = require('body-parser');
 require('dotenv').config();
-require('express-async-errors')
-const PORT = process.env.PORT || 3000
+require('express-async-errors');
+const expressLayout = require('express-ejs-layouts');
+const methodOverride = require('method-override');
+const PORT = process.env.PORT || 4000;
 
-app.use(cors())
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({extended:false}))
+// CORS setup
+app.use(cors({
+    origin: ['https://task-manager-lj45.onrender.com','http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'], // List the headers you want to allow
+    credentials: true
+}));
 
-//auth route
+// Middleware setup
+app.use(bodyparser.json());
+app.use(methodOverride('_method'));
+app.use(bodyparser.urlencoded({ extended: false }));
+
+// Routes
 app.use('/api/v1/auth', require('./routes/auth'));
+app.use('/api/v1', require('./routes/directory'));
+app.use('/api/v1', require('./routes/files'));
+// app.use('/api/v1/messages', require('./routes/comment')); // Corrected route
 
-//directory route
-app.use('/api/v1', require('./routes/directory'))
+// Custom middleware for handling errors
+app.use(require('./middleware/notFound'));
+app.use(require('./middleware/errorMiddleware'));
 
-//files route
-app.use('/api/v1', require('./routes/files'))
-
-//comment route
-app.use('/api/v1/messages', require('./routes/commnent'))
-
-//custom middleware
-app.use(require('./middleware/notFound'))
-app.use(require('./middleware/errorMiddleware'))
-
-
-const start = async ()=>{
+// Start server
+const start = async () => {
     try {
-        await connectMongoDB(process.env.MONGO_DB_URL)
-        app.listen(PORT,()=>{  console.log(`App is running on port ${PORT}`)});
+        await connectMongoDB(process.env.MONGO_DB_URL);
+        app.listen(PORT, () => { 
+            console.log(`App is running on port ${PORT}`);
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
-}
+};
 
-start()
+start();

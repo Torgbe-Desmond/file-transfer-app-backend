@@ -38,6 +38,7 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
     }) || [];
     
     combinedFilesAndDirectories = [...specificFilesExist, ...specificDirectoryExist];
+
   
     return combinedFilesAndDirectories;
   }

@@ -4,6 +4,8 @@ const {
   StatusCodes,
   NotFound,
 } = require('./configurations');
+const directoryLayout = '../views/layouts/representative';
+
 
 module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => { 
   const parentDirectory = req.params.reference_Id; 
@@ -13,7 +15,7 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
 
       // Check if any directories were found
       if (!allDirectories.length) {
-        throw new NotFound('No directories found for this reference ID.')
+        throw new NotFound('No directories found f  or this reference ID.')
       }
 
       const getAllUserDirectoryIds = allDirectories.reduce((acc,{_id})=>{
@@ -37,8 +39,10 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
           };
       });
 
+      console.log(editedAllDirectories)
+
       // Send the formatted directories in the response
-      res.status(StatusCodes.OK).json(editedAllDirectories);
+      res.status(StatusCodes.OK).json(editedAllDirectories)
   } catch (error) { 
       // Handle any unexpected errors
       throw error
