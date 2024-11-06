@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 4000;
 
 // CORS setup
 app.use(cors({
-    origin: ['https://task-manager-lj45.onrender.com','http://localhost:3000'],
+    origin: ['https://student-rep.vercel.app/','http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'], // List the headers you want to allow
     credentials: true
