@@ -1,4 +1,3 @@
-const privateStudentDir = require('../../utils/directory/createPrivateUsers');
 const {
     expressAsyncHandler,
     Directory,
@@ -15,8 +14,6 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
         body: { name, mimetype }, // Extract directory name, mimetype, and optional excelFile from the body
         params: { directoryId: parentDirectory } // Extract parent directory ID from URL parameters
     } = req;
-
-    console.log(req.body,parentDirectory)
 
     // Start a MongoDB session for transaction management
     const session = await mongoose.startSession();

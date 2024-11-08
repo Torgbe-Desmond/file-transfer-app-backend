@@ -20,8 +20,18 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
 
 
       // Map over the directories to create a formatted response
-      const editedAllDirectories = allDirectories.map(({ _id, parentDirectory, name, mimetype, lastUpdated, subDirectories, files, privateDirectory }) => {
-          let totalSize = (subDirectories.length + files.length) || 0; // Calculate total size based on subdirectories and files
+      const editedAllDirectories = allDirectories.map((
+        { 
+          _id, 
+          parentDirectory, 
+          name, 
+          mimetype, 
+          lastUpdated, 
+          subDirectories, 
+          files, 
+          privateDirectory
+         }) => {
+          let totalSize = (subDirectories.length + files.length) || 0; 
           return {
               _id,
               parentDirectory,

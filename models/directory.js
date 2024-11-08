@@ -18,6 +18,4 @@ const directorySchema = new Schema({
 module.exports = mongoose.model('Directory', directorySchema);
 
 
-const itemsToRemove = ['-files', '-subDirectories', '-comments', '-interfaceId', '-user_id', '-size', '-lastUpdated','-parentDirectory'];
-
 

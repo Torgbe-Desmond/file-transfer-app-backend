@@ -7,8 +7,6 @@ const { v4: uuidv4 } = require('uuid');
 const mongoose = require('mongoose');
 const Directory = require('../../models/directory.js');
 const User = require('../../models/user.js');
-const Student = require('../../models/student.js')
-// const Courses = require('../../models/courses.js')
 
 module.exports = {
     bcryptjs,
@@ -21,6 +19,5 @@ module.exports = {
     mongoose,
     Directory,
     User,
-    Student,
 };
 

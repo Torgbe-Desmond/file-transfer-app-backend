@@ -74,7 +74,7 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
         res.status(StatusCodes.OK).json({ message: 'Directories deleted successfully', filesAndDirectoriesToDelete:filesAndDirectoriesToDelete });
     } catch (error) {
         await session.abortTransaction(); // Rollback the transaction on error
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message || 'Failed to delete directories' });
+        throw error;
     } finally {
         session.endSession();
     }

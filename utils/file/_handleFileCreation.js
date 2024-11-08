@@ -1,17 +1,13 @@
 const { uploadMultipleFilesToGroup } = require("../FirebaseInteractions");
 const extractFileNameFromUrl = require("./extractFileFromUrl");
 
-const extractFileIds = (files) => {
-    return files.map(({ _id }) => _id); 
-};
-
 const _handleFileCreation = async (user_id, files,directoryId) => {
+    console.log('user_id',user_id)
     try {
 
         const filesWithoutBuffer = files.map(({ buffer, ...file }) => file);
-
+        console.log('before upload')
         const fileUrls = await uploadMultipleFilesToGroup(user_id, files);
-        
         let extractedFilenamesFromUrl = fileUrls.map(url => extractFileNameFromUrl(url));
 
         const filesWithUrl = filesWithoutBuffer.map(({ originalname, ...file }) => {
@@ -28,11 +24,8 @@ const _handleFileCreation = async (user_id, files,directoryId) => {
 
         const filesWithoutOriginalname = filesWithUrl.map(({ encoding, fieldname, originalname, ...file }) => file);
 
-        const fileIds = extractFileIds(filesWithoutOriginalname);
-
         return {
             files: filesWithoutOriginalname,
-            fileIds: fileIds
         };
     } catch (error) {
         throw error;

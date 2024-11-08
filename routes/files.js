@@ -1,22 +1,39 @@
 const router = require('express').Router();
+const getFile = require('../controllers/file/cli.getFile');
 const { createFile } = require('../controllers/file/createFile');
 const { deleteFile } = require('../controllers/file/deleteFile');
 const { downloadFile } = require('../controllers/file/downloadFile');
 const { getAllFiles } = require('../controllers/file/getAllFiles');
 const { moveFiles } = require('../controllers/file/moveFiles');
-const {upload} = require('../controllers/file/configurations')
 const protectRoutes = require('../middleware/protectRoutes');
+const multer = require('multer');
 
-router.post('/:reference_Id/directories/:directoryId/stuff', upload.array('files'), protectRoutes, createFile);
+// Setup in-memory storage for file uploads with multer
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-router.post('/:reference_Id/directories/:directoryId/stuff/subscription', upload.array('files'), protectRoutes, createFile);
+// Apply protection middleware to all routes
+router.use(protectRoutes);
 
-router.delete('/delete-files', protectRoutes, deleteFile);
+// Route for uploading files to a specific directory
+router.post('/:reference_Id/directories/:directoryId/files', upload.array('files'), createFile);
 
-router.get('/:reference_Id/stuff', protectRoutes, getAllFiles);
+// Route for uploading files with a subscription feature
+router.post('/:reference_Id/directories/:directoryId/files/subscription', upload.array('files'), createFile);
 
-router.post('/:reference_Id/movefiles', protectRoutes, moveFiles);
+// Route for deleting multiple files
+router.delete('/delete-files', deleteFile);
 
-router.get('/download/:fileId', protectRoutes, downloadFile);
+// Route for retrieving a single file by file ID
+router.get('/:reference_Id/files/:fileId', getFile);
+
+// Route for retrieving all files associated with a reference ID
+router.get('/:reference_Id/files', getAllFiles);
+
+// Route for moving files to a different directory
+router.post('/:reference_Id/movefiles', moveFiles);
+
+// Route for downloading a file by file ID
+router.get('/download/:fileId', downloadFile);
 
 module.exports = router;

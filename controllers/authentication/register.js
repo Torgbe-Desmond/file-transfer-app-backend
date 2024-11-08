@@ -8,7 +8,7 @@ const {
   BadRequest, 
   uuidv4, 
   asyncHandler 
-} = require("./auth.configurations");
+} = require("./configurations");
 
 // Register a new user
 module.exports.registerUser = asyncHandler(async (req, res) => {
@@ -47,7 +47,9 @@ module.exports.registerUser = asyncHandler(async (req, res) => {
     }], { session });
 
     // Default folders to be created for every new user
-    const defaultFolders = ["Home", "Subscriptions"];
+    const defaultFolders = ["Workspace", "cli-interactions"];
+    // for the cli interactions any file you upload using the cli would be stored here
+    // though with the cli you have access to all your files
 
     // Create default directories (folders) for the new user in the Directory collection
     for (const name of defaultFolders) {

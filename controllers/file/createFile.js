@@ -8,12 +8,16 @@ const {
     StatusCodes
 } = require('./configurations');
 
+
+
 module.exports.createFile = expressAsyncHandler(async (req, res) => {
     const { user: user_id } = req;
     const { directoryId } = req.params;
 
     const session = await mongoose.startSession();
     session.startTransaction();
+
+    console.log('video',req.files)
 
     try {
         const directoryExist = await Directory.findById(directoryId).session(session);

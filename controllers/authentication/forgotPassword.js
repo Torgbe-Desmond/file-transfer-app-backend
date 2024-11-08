@@ -1,4 +1,4 @@
-const { User, mongoose, bcryptjs, asyncHandler, StatusCodes, BadRequest } = require("./auth.configurations");
+const { User, mongoose, bcryptjs, asyncHandler, StatusCodes, BadRequest } = require("./configurations");
 
 module.exports.forgotPassword = asyncHandler(async (req, res) => {
   // Retrieve the user ID from the authenticated request

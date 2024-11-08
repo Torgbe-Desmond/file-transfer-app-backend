@@ -3,10 +3,9 @@ const { Unauthorized } = require('../Errors/index');
 const User = require('../models/user')
 
 const protectRoutes = async (req, res, next) => {
-
     try {
 
-        const header = req.headers.authorization;
+        const header = req.headers?.authorization || req.headers?.Authorization;
         if (!header || !header.startsWith('Bearer ')){
             console.log(1)
             throw new Unauthorized('Unauthorized');

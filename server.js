@@ -26,7 +26,6 @@ app.use(bodyparser.urlencoded({ extended: false }));
 app.use('/api/v1/auth', require('./routes/auth'));
 app.use('/api/v1', require('./routes/directory'));
 app.use('/api/v1', require('./routes/files'));
-// app.use('/api/v1/messages', require('./routes/comment')); // Corrected route
 
 // Custom middleware for handling errors
 app.use(require('./middleware/notFound'));

@@ -1,4 +1,4 @@
-const { User, asyncHandler, StatusCodes } = require("./auth.configurations");
+const { User, asyncHandler, StatusCodes } = require("./configurations");
 
 module.exports.getAll = asyncHandler(async (req, res) => {
   // Fetch all users from the database

@@ -1,4 +1,4 @@
-const { Directory, mongoose, asyncHandler, deleteDirectoryRecursive } = require('./auth.configurations');
+const { Directory, mongoose, asyncHandler, deleteDirectoryRecursive } = require('./configurations');
 
 // Function to delete a user, wrapped with asyncHandler to handle async errors
  const deleteUser = asyncHandler(async (req, res) => {

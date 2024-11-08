@@ -40,7 +40,7 @@ module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
       );
 
       if (!updatedDirectory) {
-          throw new Error('Failed to update directory name.');
+           throw new BadRequest('Failed to update directory name.');
       }
 
       // Prepare response object

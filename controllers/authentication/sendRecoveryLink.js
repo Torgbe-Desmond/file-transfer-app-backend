@@ -1,4 +1,4 @@
-const {asyncHandler  } = require("./auth.configurations");
+const {asyncHandler  } = require("./configurations");
 
 
 

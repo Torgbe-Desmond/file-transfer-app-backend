@@ -5,7 +5,7 @@ const {
   generateAuthToken, 
   asyncHandler, 
   StatusCodes 
-} = require("./auth.configurations");
+} = require("./configurations");
 // Login user function
 module.exports.loginUser = asyncHandler(async (req, res) => {
   try {

@@ -15,6 +15,8 @@ module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
     const { fileIds, directoryId } = req.body;
     const user_id = req.user; // Get the user ID from the request
 
+    console.log(fileIds, directoryId)
+
     // Start a new Mongoose session for transaction management
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -25,17 +27,23 @@ module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
 
         // Loop through each file ID to delete the corresponding file
         for (const fileId of fileIds) {
+
             // Check if the file exists in the database
             const fileExist = await File.findOne({ _id: fileId }).session(session);
-            if (fileExist === null) continue; // If the file doesn't exist, skip to the next iteration
+
+            if (!fileExist) continue; // If the file doesn't exist, skip to the next iteration
             
             // Delete the file from the database and push its ID to the deletedFiles array
             const fileExisted = await File.findByIdAndDelete(fileId, { session });
-            deletedFiles.push(fileExisted._id); // Store the deleted file's ID
-            
             // If the file was successfully deleted, remove it from storage
             if (fileExisted) {
-                await deleteFileFromStorage(user_id, fileExisted.originalname);
+                try {
+                    await deleteFileFromStorage(user_id, fileExisted.name);
+                    deletedFiles.push(fileExisted._id); 
+                } catch (error) {
+                    await session.abortTransaction();
+                    throw error;
+                }   
             }
         }
 
