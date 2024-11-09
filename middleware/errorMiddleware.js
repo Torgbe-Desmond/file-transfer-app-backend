@@ -30,7 +30,7 @@ const errorMiddleware = (err,req,res,next)=>{
     
         }
 
-        res.status(createCustomError.statusCode).json({message:err.message})
+        res.status(createCustomError.statusCode).json({message:createCustomError.message})
 
 }
 
