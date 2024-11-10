@@ -7,6 +7,7 @@ const {
     NotFound, 
     StatusCodes
 } = require('./configurations');
+const { fileQueue } = require('../../socket/functions/uploadFunction')
 
 
 
@@ -17,7 +18,6 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-    console.log('video',req.files)
 
     try {
         const directoryExist = await Directory.findById(directoryId).session(session);
@@ -25,7 +25,7 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
             throw new NotFound(`Directory with ID ${directoryId} not found.`);
         }
         
-        const { files, fileIds } = await _handleFileCreation(user_id, req.files, directoryId);
+        const { files } = await _handleFileCreation(user_id, req.files, directoryId);
 
         // Filter out files that already exist
         const filesToInsert = [];
@@ -33,6 +33,8 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
             const fileExist = await File.findOne({ name: file.name }).session(session);
             if (!fileExist) {
                 filesToInsert.push(file);
+            } else {
+                continue;
             }
         }
 

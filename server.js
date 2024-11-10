@@ -1,11 +1,9 @@
-const express = require('express');
-const app = express();
+const { io, app, server  } = require('./socket/socket')
 const { connectMongoDB } = require('./db/db');
 const cors = require('cors');
 const bodyparser = require('body-parser');
 require('dotenv').config();
 require('express-async-errors');
-const expressLayout = require('express-ejs-layouts');
 const methodOverride = require('method-override');
 const PORT = process.env.PORT || 4000;
 
@@ -35,7 +33,7 @@ app.use(require('./middleware/errorMiddleware'));
 const start = async () => {
     try {
         await connectMongoDB(process.env.MONGO_DB_URL);
-        app.listen(PORT, () => { 
+        server.listen(PORT, () => { 
             console.log(`App is running on port ${PORT}`);
         });
     } catch (error) {

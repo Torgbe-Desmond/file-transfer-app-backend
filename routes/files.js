@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const getFile = require('../controllers/file/cli.getFile');
-const { createFile } = require('../controllers/file/createFile');
+// const { createFile } = require('../controllers/file/createFile');
+const { createFile } = require('../utils/file/test');
 const { deleteFile } = require('../controllers/file/deleteFile');
 const { downloadFile } = require('../controllers/file/downloadFile');
 const { getAllFiles } = require('../controllers/file/getAllFiles');

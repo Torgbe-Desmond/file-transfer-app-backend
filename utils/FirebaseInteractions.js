@@ -56,7 +56,6 @@ const uploadMultipleFilesToGroup = async (user_id, files) => {
             const fileUrl = await uploadFileToStorage(user_id, { originalname, mimetype, buffer });
             fileUrls.push(fileUrl); // Append each file URL to the array
         }
-        console.log('fileUrls', fileUrls);
         return fileUrls; // Return the array of all uploaded file URLs
     } catch (error) {
         console.error('Error uploading multiple files:', error);
@@ -64,6 +63,17 @@ const uploadMultipleFilesToGroup = async (user_id, files) => {
     }
 };
 
+
+const uploadMultipleFilesToGroupV2 = async (user_id, file) => {
+    try {
+        const { originalname, mimetype, buffer } = file;
+        const fileUrl = await uploadFileToStorage(user_id, { originalname, mimetype, buffer });
+        return fileUrl; 
+    } catch (error) {
+        console.error('Error uploading multiple files:', error);
+        throw error;
+    }
+};
 
 
 // Function to delete a file from Firebase Storage
@@ -106,5 +116,6 @@ module.exports = {
     uploadFileToStorage,
     deleteFilesInDirectory,
     deleteFileFromStorage,
+    uploadMultipleFilesToGroupV2,
     uploadMultipleFilesToGroup
 };

@@ -6,65 +6,47 @@ const {
     File,
     StatusCodes,
     mongoose,
-    payDesmondUtils,
 } = require('./configurations');
 
 // Async handler to delete files from a specified directory
 module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
-    // Extract file IDs and directory ID from the request body
     const { fileIds, directoryId } = req.body;
-    const user_id = req.user; // Get the user ID from the request
+    const user_id = req.user;
 
-    console.log(fileIds, directoryId)
-
-    // Start a new Mongoose session for transaction management
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-        // Array to hold the IDs of deleted files
         let deletedFiles = [];
 
-        // Loop through each file ID to delete the corresponding file
         for (const fileId of fileIds) {
-
-            // Check if the file exists in the database
             const fileExist = await File.findOne({ _id: fileId }).session(session);
+            if (!fileExist) continue;
 
-            if (!fileExist) continue; // If the file doesn't exist, skip to the next iteration
-            
-            // Delete the file from the database and push its ID to the deletedFiles array
             const fileExisted = await File.findByIdAndDelete(fileId, { session });
-            // If the file was successfully deleted, remove it from storage
             if (fileExisted) {
                 try {
                     await deleteFileFromStorage(user_id, fileExisted.name);
-                    deletedFiles.push(fileExisted._id); 
+                    deletedFiles.push(fileExisted._id);
                 } catch (error) {
-                    await session.abortTransaction();
-                    throw error;
-                }   
+                    console.error(`Failed to delete file from storage: ${error.message}`);
+                }
             }
         }
 
-        // Find the corresponding directory and remove the deleted files from its files array
         const fileDirectory = await Directory.findById(directoryId).session(session);
-        fileDirectory.files.pull(...deletedFiles); // Remove deleted file IDs from the directory's files array
-        
-        // Save the updated directory
-        await fileDirectory.save();
+        if (fileDirectory) {
+            fileDirectory.files.pull(...deletedFiles);
+            await fileDirectory.save({ session });
+        }
 
-        // Commit the transaction to finalize the changes
         await session.commitTransaction();
-
-        // Respond with the IDs of the deleted files
         res.status(StatusCodes.OK).json(deletedFiles);
+
     } catch (error) {
-        // Abort the transaction if an error occurs
         await session.abortTransaction();
-        throw error; // Rethrow the error for further handling
+        throw error;
     } finally {
-        // End the Mongoose session
         session.endSession();
     }
 });
