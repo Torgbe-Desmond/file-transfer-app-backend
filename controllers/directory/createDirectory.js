@@ -66,6 +66,7 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
             user_id: newDirectory.user_id,
             mimetype: newDirectory.mimetype,
             size: newDirectory.size,
+            lastUpdated:newDirectory.lastUpdated,
         };
 
         // Send response

@@ -34,7 +34,7 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
             if (!fileExist) {
                 filesToInsert.push(file);
             } else {
-                continue;
+                continue
             }
         }
 
