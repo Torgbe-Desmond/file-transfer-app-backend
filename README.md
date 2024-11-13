@@ -1,37 +1,133 @@
-Project Setup
-To set up and run this project locally:
+## file-transfer-app-backend
 
-Clone the repository:
-git clone <repository-url>
+A backend application designed for managing user authentication, directories, and file transfers. This application leverages **Express.js** for server management, **MongoDB** with **Mongoose** for data storage, **Firebase** for file storage, and includes middleware for enhanced security and error handling.
 
-Install the dependencies:
-npm install
-Set up the environment variables as described in the Environment Variables section.
+## Table of Contents
 
-Run the project:
-npm start
+- [Project Details](#project-details)
+- [Setup](#setup)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [API Routes Documentation](#api-routes-documentation)
+  - [Authentication Routes](#authentication-routes)
+  - [Directory Routes](#directory-routes)
+  - [File Routes](#file-routes)
+- [Scripts](#scripts)
+- [Usage](#usage)
+- [Testing](#testing)
 
-Environment Variables
-Ensure you create a .env file in the root directory and include the following variables:
-FIREBASE_API_KEY=your_firebase_api_key
-FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-FIREBASE_PROJECT_ID=your_firebase_project_id
-FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-FIREBASE_APP_ID=your_firebase_app_id
-FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
-MONGO_DB_URL=your_mongo_db_url
-JWT_KEY=your_jwt_secret_key
+### Project Details
 
-Database Models
-1. User
-Stores user information such as username, email, password, reference_Id, and role.
-2. Student
-Holds student-specific data like studentName, indexNumber, studentNumber and reference_Id.
-3. Directory
-Organizes files and folders into directories, with references to subDirectories, files, and comments.
-4. File
-Stores file details like originalname, url, directoryId, user_id, mimetype, and size.
-5. Comment
-Allows users to add comments on specific directories.
+| **Name**             | file-transfer-app-backend                                                                           |
+|----------------------|-----------------------------------------------------------------------------------------------------|
+| **Version**          | 1.0.0                                                                                               |
+| **Main Entry Point** | server.js                                                                                           |
+| **Description**      | A backend server to handle file transfer operations, directory management, and user authentication. |
 
+### Setup
+
+#### Prerequisites
+
+- Node.js (v14 or later)
+- MongoDB (local or MongoDB Atlas account)
+- Firebase console
+- npm or yarn
+
+### Features
+
+- User registration and authentication
+- JWT-based secure authentication
+- Protected routes for managing user files and directories
+- File sharing functionality
+- Creation, deletion, and updating folders
+- Ability to move files between directories
+
+### Scripts
+
+| **Script Name** | **Description**                                                          | **Command** |
+|-----------------|--------------------------------------------------------------------------|-------------|
+| `start`         | Starts the server with Nodemon for automatic reloads during development. | `npm start` |
+
+### Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/Torgbe-Desmond/file-transfer-app-backend.git
+    cd file-transfer-app-backend
+    ```
+
+2. Install dependencies:
+    ```bash
+    npm install
+    ```
+
+3. Create a `.env` file in the root directory with the following variables:
+    ```plaintext
+    PORT=4000
+    MONGO_URI=your_mongodb_uri
+    JWT_SECRET=your_jwt_secret_key
+    ```
+
+4. Start the server:
+    ```bash
+    npm start
+    ```
+
+### Environment Variables
+
+| **Variable**                      | **Description**                                                       |
+|-----------------------------------|-----------------------------------------------------------------------|
+| `PORT`                            | Port for the server (default 4000)                                    |
+| `MONGO_URI`                       | MongoDB connection URI                                                |
+| `JWT_SECRET`                      | Secret key for JWT token generation                                   |
+| `FIREBASE_API_KEY`                | Firebase API key for authentication and other Firebase services       |
+| `FIREBASE_AUTH_DOMAIN`            | Firebase authentication domain                                        |
+| `FIREBASE_PROJECT_ID`             | Firebase project ID                                                   |
+| `FIREBASE_STORAGE_BUCKET`         | Firebase storage bucket URL                                           |
+| `FIREBASE_MESSAGING_SENDER_ID`    | Firebase messaging sender ID                                          |
+| `FIREBASE_APP_ID`                 | Firebase application ID                                               |
+| `FIREBASE_MEASUREMENT_ID`         | Firebase measurement ID for analytics                                 |
+| `MONGO_DB_URL`                    | MongoDB connection URI for the application database                   |
+| `JWT_KEY`                         | Secret key for JWT token generation                                   |
+
+### API Routes Documentation
+
+This application includes routes for **Authentication**, **Directory Management**, and **File Management**. Each section provides a summary of the routes, their methods, and purpose.
+
+#### Authentication Routes
+
+| **Route**            | **Method** | **Description**                          | **Protected** |
+|----------------------|------------|------------------------------------------|---------------|
+| `/login`             | POST       | Log in an existing user                  | No            |
+| `/register`          | POST       | Register a new user                      | No            |
+| `/delete`            | POST       | Delete the logged-in user                | Yes           |
+| `/recovery`          | GET        | Send a recovery link via email           | No            |
+| `/forgot-password`   | POST       | Reset password with a recovery token     | Yes           |
+| `/all`               | GET        | Retrieve all registered users            | No            |
+
+#### Directory Routes
+
+| **Route**                                           | **Method** | **Description**                                  | **Protected** |
+|-----------------------------------------------------|------------|--------------------------------------------------|---------------|
+| `/:reference_Id/directories`                        | GET        | Retrieve all directories by reference ID         | Yes           |
+| `/:reference_Id/directories/:directoryId`           | POST       | Create a new directory                           | Yes           |
+| `/:reference_Id/directories/all`                    | GET        | Retrieve all directories for moving              | Yes           |
+| `/delete-directory`                                 | DELETE     | Delete a specified directory                     | Yes           |
+| `/:reference_Id/directories/:directoryId`           | GET        | Retrieve a specific directory                    | Yes           |
+| `/:reference_Id/moveDirectories`                    | POST       | Move directories to a new location               | Yes           |
+| `/:reference_Id/renameDirectory`                    | POST       | Rename a directory                               | Yes           |
+| `/:reference_Id/share/:directoryId`                 | POST       | Share a specific directory                       | Yes           |
+| `/:reference_Id/share`                              | POST       | Receive files shared to a directory              | Yes           |
+
+#### File Routes
+
+| **Route**                                                | **Method** | **Description**                                  | **Protected** |
+|----------------------------------------------------------|------------|--------------------------------------------------|---------------|
+| `/:reference_Id/directories/:directoryId/files`          | POST       | Upload files to a specific directory             | Yes           |
+| `/:reference_Id/directories/:directoryId/files/subscription` | POST       | Upload files with subscription feature           | Yes           |
+| `/delete-files`                                          | DELETE     | Delete multiple files                            | Yes           |
+| `/:reference_Id/files/:fileId`                           | GET        | Retrieve a single file by file ID                | Yes           |
+| `/:reference_Id/files`                                   | GET        | Retrieve all files associated with reference     | Yes           |
+| `/:reference_Id/movefiles`                               | POST       | Move files to a different directory              | Yes           |
+| `/download/:fileId`                                      | GET        | Download a file by file ID                       | Yes           |
