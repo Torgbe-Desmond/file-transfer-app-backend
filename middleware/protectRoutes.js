@@ -10,7 +10,7 @@ const protectRoutes = async (req, res, next) => {
             throw new Unauthorized('Unauthorized');
         }
 
-        const token = (header.split(' ')[1]);
+        const token = JSON.parse(header.split(' ')[1]);
         const decoded = jwt.verify(token, process.env.JWT_KEY);
 
         if (!decoded._id){
