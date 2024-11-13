@@ -65,8 +65,15 @@ A backend application designed for managing user authentication, directories, an
 3. Create a `.env` file in the root directory with the following variables:
     ```plaintext
     PORT=4000
-    MONGO_URI=your_mongodb_uri
-    JWT_SECRET=your_jwt_secret_key
+    MONGO_DB_URL=your_mongodb_uri_key
+    JWT_KEY=your_jwt_secret_key
+    FIREBASE_API_KEY=your_firebase_api_key
+    FIREBASE_AUTH_DOMAIN=your_firebase_domain_key
+    FIREBASE_PROJECT_ID =your_firebase_project_id_key
+    FIREBASE_STORAGE_BUCKET=your_firebase_bucket_key
+    FIREBASE_MESSAGING_SENDER_ID=your_firebase_message_sender_id_key
+    FIREBASE_APP_ID = your_firebase_app_id_key
+    FIREBASE_MEASUREMENT_ID = your_firebase_measurement_id_key
     ```
 
 4. Start the server:
