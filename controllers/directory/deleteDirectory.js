@@ -26,15 +26,12 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
         let rootFilesInParentDirectory = []
 
         for (const directoryId of directoryIds) {
-            // Check if directory exists
+
             const directoryExist = await Directory.findById(directoryId).session(session);
             if (!directoryExist) {
                 throw new NotFound('Directory not found.');
             }
 
-            console.log('directoryId',directoryId)
-
-            // Retrieve the directory tree structure
             const directoryTreeObject = await getDirectoryTree(directoryExist._id, session);
             if (directoryTreeObject) {
                 // The first id in the directoryToDelete array is the parent directory of the
@@ -47,7 +44,6 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
 
             const { directoriesToDelete, filesToDelete } = directoryTreeObject;
 
-            // Update subdirectories and files of the current directory
             if (directoriesToDelete.length > 0) {
                 directoryExist.subDirectories.push(...directoriesToDelete);
             }
@@ -58,22 +54,21 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
             await directoryExist.save({ session });
         }
 
-
         await Directory.deleteMany({ _id: { $in: rootDirectoriesInParentDirectory } }).session(session);
 
         parent.subDirectories.pull(...rootDirectoriesInParentDirectory);
+        
         parent.files.push(...rootFilesInParentDirectory);
 
         await parent.save()
 
         const filesAndDirectoriesToDelete = [...rootDirectoriesInParentDirectory,...rootFilesInParentDirectory]
 
-        // Commit the transaction after successful operations
         await session.commitTransaction();
 
         res.status(StatusCodes.OK).json({ message: 'Directories deleted successfully', filesAndDirectoriesToDelete:filesAndDirectoriesToDelete });
     } catch (error) {
-        await session.abortTransaction(); // Rollback the transaction on error
+        await session.abortTransaction();
         throw error;
     } finally {
         session.endSession();

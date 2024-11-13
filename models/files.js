@@ -6,9 +6,11 @@ const fileSchema = new Schema({
     url: { type: String, default:'fileUrl' },
     directoryId: { type: String, required: true, ref:'Directory' },
     user_id: { type: String, required: true },
-    mimetype: { type: String, default: 'File' }, // Set default value to 'file'
-    lastUpdated: { type: Date, default: Date.now }, // Adding lastUpdated field
-    size: { type: Number, default: 0 } // Adding size field
+    mimetype: { type: String, default: 'File' }, 
+    lastUpdated: { type: Date, default: Date.now }, 
+    size: { type: Number, default: 0 }, 
+    shared: { type: Boolean, default: false },
+
 });
 
 module.exports = mongoose.model('File', fileSchema);

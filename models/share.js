@@ -3,9 +3,7 @@ const { Schema } = mongoose;
 
 const shareSchema = new Schema({
     owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    receiver:[{
-        type: Schema.Types.ObjectId, ref: 'User'
-    }],
+    secretCode:{type:String},
     files: [{ type: Schema.Types.ObjectId, ref: 'File' }],
 });
 

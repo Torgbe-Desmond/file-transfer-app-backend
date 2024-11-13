@@ -8,7 +8,6 @@ const {
     mongoose,
 } = require('./configurations');
 
-// Async handler to delete files from a specified directory
 module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
     const { fileIds, directoryId } = req.body;
     const user_id = req.user;
@@ -26,7 +25,9 @@ module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
             const fileExisted = await File.findByIdAndDelete(fileId, { session });
             if (fileExisted) {
                 try {
-                    await deleteFileFromStorage(user_id, fileExisted.name);
+                    if(!fileExisted.shared){
+                        await deleteFileFromStorage(user_id, fileExisted.name);
+                    }
                     deletedFiles.push(fileExisted._id);
                 } catch (error) {
                     console.error(`Failed to delete file from storage: ${error.message}`);

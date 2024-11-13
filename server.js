@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 4000;
 app.use(cors({
     origin: ['https://student-rep.vercel.app','http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'], // List the headers you want to allow
+    allowedHeaders: ['Content-Type', 'Authorization'], 
     credentials: true
 }));
 

@@ -1,3 +1,4 @@
+const generateRandomString = require('../../utils/generateRandomString');
 const {
     expressAsyncHandler,
     Directory,
@@ -5,50 +6,52 @@ const {
     NotFound,
     StatusCodes,
     mongoose,
+    Share,
 } = require('./configurations');
 
-// Duplicate files within a directory
 const shareDirectory = expressAsyncHandler(async (req, res) => {
-    const { directoryId } = req.params; // Assume directory ID is provided in the request parameters
+    const { directoryId } = req.params; 
+    const user = req.user
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
     try {
-        // Find the directory and files within it
         const directory = await Directory.findById(directoryId);
         if (!directory) {
             throw new NotFound('Directory not found');
         }
 
-        // Fetch all files in the directory
-        const files = directory.files; // Assuming `files` is an array of file references in the directory
+        const files = directory.files; 
         
-        // Check if files exist to duplicate
         if (!files || files.length === 0) {
             throw new BadRequest('No files to duplicate in this directory');
         }
 
-        // Duplicate each file in the directory
-        const duplicatedFiles = files.map(file => {
-            // Create a new object with the same properties, but generate a new unique ID
-            return {
-                ...file._doc, // Copy the original file data
-                _id: new mongoose.Types.ObjectId(), // Generate a new ID for the duplicated file
-                createdAt: new Date(), // Set a new creation timestamp
-                name: `${file.name}_copy`, // Add "_copy" to the file name to indicate it's a duplicate
-            };
-        });
-    
-        // Save the duplicated files in the directory (assuming this is the correct way to update the directory)
-        directory.files.push(...duplicatedFiles);
-        await directory.save();
+        const duplicatedFiles = files.map((file)=>file._id);
+        const randomString =  `${generateRandomString(8)}@sr`
+
+
+        const shareResults = await Share.create([
+            {
+                owner:user,
+                secretCode:randomString,
+                files:duplicatedFiles
+            }
+        ],{session})
+
+
+        await session.commitTransaction();
 
         res.status(StatusCodes.OK).json({
             message: 'Files duplicated successfully',
-            duplicatedFiles,
+            shareResults,
         });
     } catch (error) {
-        res.status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR).json({
-            message: error.message || 'An error occurred while duplicating files',
-        });
+        await session.abortTransaction();
+        throw error
+    } finally {
+        session.endSession();
     }
 });
 

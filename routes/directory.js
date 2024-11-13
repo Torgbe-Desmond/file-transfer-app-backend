@@ -7,6 +7,8 @@ const { moveDirectories } = require('../controllers/directory/moveDirectories')
 const { renameDirectory } = require('../controllers/directory/renameDirectory')
 const protectRoutes = require('../middleware/protectRoutes')
 const { createDirectory } = require('../controllers/directory/createDirectory')
+const { shareDirectory } = require('../controllers/directory/shareDirectory')
+const { receiveSharedFiles } = require('../controllers/directory/receiveSharedFiles')
 
 
 router.get('/:reference_Id/directories',protectRoutes,getAllDirectories)
@@ -22,6 +24,11 @@ router.get('/:reference_Id/directories/:directoryId',protectRoutes,getAdirectory
 router.post('/:reference_Id/moveDirectories',protectRoutes,moveDirectories )
 
 router.post('/:reference_Id/renameDirectory',protectRoutes,renameDirectory)
+
+router.post('/:reference_Id/share/:directoryId',protectRoutes,shareDirectory)
+
+router.post('/:reference_Id/share',protectRoutes,receiveSharedFiles)
+
 
 
 

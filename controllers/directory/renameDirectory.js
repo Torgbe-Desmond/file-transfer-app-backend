@@ -10,8 +10,6 @@ const {
 module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
   const { _id, name } = req.body;
 
-  console.log( _id, name)
-  // Input validation
   if (!_id || !name) {
       throw new BadRequest('Directory ID and new name must be provided.');
   }
@@ -20,19 +18,17 @@ module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
-      // Check if the directory exists
+
       const directoryExist = await Directory.findById(_id).session(session);
       if (!directoryExist) {
           throw new NotFound('No such directory found.');
       }
 
-      // Check if the name already exists in another directory
       const nameExist = await Directory.findOne({ name }).session(session);
       if (nameExist && nameExist._id.toString() !== _id) {
           throw new BadRequest('Name already exists.');
       }
 
-      // Update the directory name
       const updatedDirectory = await Directory.findByIdAndUpdate(
           _id,
           { name },
@@ -43,13 +39,11 @@ module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
            throw new BadRequest('Failed to update directory name.');
       }
 
-      // Prepare response object
       const { _id: updatedId, name: updatedName } = updatedDirectory;
       const newUpdatedDirectory = { _id: updatedId, name: updatedName };
 
-      // Commit the transaction
       await session.commitTransaction();
-      res.status(StatusCodes.OK).json(newUpdatedDirectory); // Use OK instead of CREATED for updates
+      res.status(StatusCodes.OK).json(newUpdatedDirectory); 
 
   } catch (error) {
       await session.abortTransaction();
