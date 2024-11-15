@@ -6,45 +6,41 @@ const {
     mongoose,
     Share,
     File,
-    Directory
+    Directory,
+    Secrete
 } = require('./configurations');
 
 const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
-    const { secretCode, directoryId } = req.body;
+    const { secreteCode } = req.body;
     const user = req.user
 
+    console.log('secreteCode',secreteCode)
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-        const checkSecretCode = secretCode.split('@');
-        if (!checkSecretCode.includes('sr')) {
-            throw new BadRequest('Invalid secret.');
-        }
-
-        const directoryExist = await Directory.findOne({_id:directoryId});
+    
+        const directoryExist = await Directory.findOne({name:'ReceivedFiles',user_id:user});
 
         if(!directoryExist){
             throw new NotFound('Directory not found.');
         }
 
-        const sharedFiles = await Share.findOne({ secretCode }).populate('files');
-        if (!sharedFiles) {
-            throw new NotFound('Share not found.');
+        const sharedFilesExist = await Directory.findOne({name:secreteCode}).populate('files');
+
+        if(!sharedFilesExist){
+            throw new NotFound('Shared files not found.');
         }
 
-        if (sharedFiles.files.length === 0) {
-            throw new NotFound('Share is empty.');
-        }
-  
-        const duplicatedFiles = sharedFiles.files.reduce((acc,value) =>{
+        const duplicatedFiles = sharedFilesExist.files.reduce((acc,value) =>{
             acc.push({
-              name: `${value.name}_$shared`,
+              name: `${value.name}`,
               shared: true,
               user_id:user,
               url:value.url,
               mimetype:value.mimetype,
-              directoryId
+              directoryId:directoryExist._id,
+              size:value.size
             })
             return acc;
         },[]);
@@ -61,7 +57,6 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
 
         res.status(StatusCodes.OK).json({
             message: 'Files duplicated successfully.',
-            createSharedFiles,
         });
 
     } catch (error) {

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const { Unauthorized } = require('../Errors/index');
 const User = require('../models/user')
 
-const protectRoutes = async (req, res, next) => {
+const   protectRoutes = async (req, res, next) => {
     try {
 
         const header = req.headers?.authorization || req.headers?.Authorization;
@@ -20,7 +20,6 @@ const protectRoutes = async (req, res, next) => {
         const user = await User.findOne({_id:decoded._id})
           
         if (!user){
-            console.log(3)
             throw new Unauthorized('Unauthorized');
         }
 

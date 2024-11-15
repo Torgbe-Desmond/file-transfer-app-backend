@@ -1,3 +1,4 @@
+const { Secrete } = require("../directory/configurations");
 const { 
   User, 
   bcryptjs, 

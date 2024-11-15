@@ -25,10 +25,9 @@ router.post('/:reference_Id/moveDirectories',protectRoutes,moveDirectories )
 
 router.post('/:reference_Id/renameDirectory',protectRoutes,renameDirectory)
 
-router.post('/:reference_Id/share/:directoryId',protectRoutes,shareDirectory)
-
 router.post('/:reference_Id/share',protectRoutes,receiveSharedFiles)
 
+router.post('/:reference_Id/share/files',protectRoutes,shareDirectory)
 
 
 
