@@ -1,4 +1,5 @@
 const directory = require('../../models/directory');
+const { handleFileDuplication } = require('../../utils/file/handleFileDuplication');
 const generateRandomString = require('../../utils/generateRandomString');
 const {
     expressAsyncHandler,
@@ -15,7 +16,7 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
     const { fileIds } = req.body; 
     const user = req.user;
 
-    console.log('fileids',fileIds)
+    console.log('fileids', fileIds);
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -39,13 +40,19 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
             name: `${value.name}`,
             shared: true,
             user_id: user,
-            url: value.url,
             mimetype: value.mimetype,
             directoryId: userSharedFilesDirectory._id,
+            size: value.size,
         }));
 
         const createdDuplicatedFiles = await File.insertMany(editedDuplicatedFiles, { session });
 
+
+        const moveFileDetails = createdDuplicatedFiles.map(file => ({
+            fileId: file._id,
+            filename: file.name,
+            userId: user
+        }));
 
         const idsOfEditedDuplicated = createdDuplicatedFiles.map(file => file._id);
 
@@ -58,6 +65,7 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
                     user_id: user,
                     parentDirectory: userSharedFilesDirectory._id,
                     files: idsOfEditedDuplicated,
+                    mimetype:"Shared"
                 },
             ],
             { session }
@@ -70,9 +78,20 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
 
         res.status(StatusCodes.OK).json({
             message: 'Files duplicated successfully',
-            secreteCode: shareResult.secreteCode,
+            secreteCode: randomString,
             rejectedFiles,
         });
+
+        setImmediate(() => {
+            moveFileDetails.forEach(async (file) => {
+                try {
+                    await handleFileDuplication(file);
+                } catch (error) {
+                    console.error('Error in handleFileDuplication:', error);
+                }
+            });
+        });
+
     } catch (error) {
         await session.abortTransaction();
         throw error;

@@ -11,7 +11,7 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
 
     const { 
         user: user_id, 
-        body: { name, mimetype }, 
+        body: { name }, 
         params: { directoryId: parentDirectory } 
     } = req;
 
@@ -32,24 +32,13 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
 
         let newDirectory;
 
-        if (directoryExist.name === 'Subscriptions' || directoryExist.mimetype === 'Subscription') {
-
-            const newSubscription = await Directory.create([{ name, user_id, parentDirectory, mimetype }], { session });
+        const createdDirectory = await Directory.create([{ name, user_id, parentDirectory }], { session });
             
-            directoryExist.subDirectories.push(newSubscription[0]._id);
-            await directoryExist.save({ session });
+        directoryExist.subDirectories.push(createdDirectory[0]._id);
 
-            newDirectory = newSubscription[0]; 
-            
-        } else {
+        await directoryExist.save({ session })  
 
-            const createdDirectory = await Directory.create([{ name, user_id, parentDirectory }], { session });
-            
-            directoryExist.subDirectories.push(createdDirectory[0]._id);
-            await directoryExist.save({ session });
-
-            newDirectory = createdDirectory[0]; 
-        }
+        newDirectory = createdDirectory[0]; 
 
         await session.commitTransaction();
 

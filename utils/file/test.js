@@ -17,7 +17,6 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
             throw new NotFound(`Directory with ID ${directoryId} not found.`);
         }
 
-        // Insert metadata for each file without URL
         const filesToInsert = req.files.map(file => ({
             name: file.originalname,
             mimetype: file.mimetype,
@@ -33,10 +32,8 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
         await directoryExist.save({ session });
         await session.commitTransaction();
 
-        // Send response to client immediately after saving metadata
         res.status(StatusCodes.CREATED).json({ files: createdFiles });
 
-        // Process each file upload asynchronously
         req.files.forEach(file => handleFileUploadWorker(user_id.toString(), file));
 
     } catch (error) {

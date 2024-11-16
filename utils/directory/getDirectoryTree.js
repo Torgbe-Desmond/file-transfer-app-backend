@@ -1,6 +1,8 @@
 const Directory = require('../../models/directory');
 
 async function getDirectoryTree(directoryId, session) {
+    console.info('Creating directory tree..')
+
     const directoryTree = {
         filesToDelete: [],
         directoriesToDelete: [],
@@ -8,8 +10,6 @@ async function getDirectoryTree(directoryId, session) {
 
     // Retrieve the directory with session
     const directory = await Directory.findById(directoryId).session(session);
-
-    console.log('directory',directory)
 
     // Extract subdirectories and files if directory exists
     if (directory) {

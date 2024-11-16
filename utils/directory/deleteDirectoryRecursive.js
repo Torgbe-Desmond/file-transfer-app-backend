@@ -40,15 +40,34 @@ const { deleteFilesInDirectory } = require('../FirebaseInteractions');
 // };
 
 async function deleteDirectoryTree({ filesToDelete, directoriesToDelete }, session) {
-    // Delete directories if any
+    console.info('Deletiong directory tree..')
+
+    let fileArrayWithFileObjects = [];
+
+    for(const file of filesToDelete){
+        const fileExist = await File.findById(file);
+        if(!fileExist || fileExist.shared===true){
+            continue;
+        }
+
+        fileArrayWithFileObjects.push({
+            name:fileExist.name,
+            user_id:fileExist.user_id
+        })
+        
+    }
+
     if (directoriesToDelete && directoriesToDelete.length > 0) {
         await Directory.deleteMany({ _id: { $in: directoriesToDelete } }).session(session);
     }
 
-    // Delete files if any
     if (filesToDelete && filesToDelete.length > 0) {
         await File.deleteMany({ _id: { $in: filesToDelete } }).session(session);
     }
+
+
+    return fileArrayWithFileObjects;
+
 }
 
 

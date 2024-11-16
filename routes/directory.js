@@ -29,6 +29,4 @@ router.post('/:reference_Id/share',protectRoutes,receiveSharedFiles)
 
 router.post('/:reference_Id/share/files',protectRoutes,shareDirectory)
 
-
-
 module.exports = router;

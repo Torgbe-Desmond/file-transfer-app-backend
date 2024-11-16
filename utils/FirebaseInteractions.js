@@ -1,21 +1,21 @@
 // Import required modules and configurations
-const firebase = require('firebase/app'); // Firebase app initialization
-const File = require('../models/files'); // File model for database interactions
-const admin = require("firebase-admin"); // Firebase Admin SDK for server-side operations
-require('dotenv').config(); // Load environment variables from .env file
-const path = require('path'); // Module for handling file and directory paths
+const firebase = require('firebase/app');
+const File = require('../models/files'); 
+const admin = require("firebase-admin"); 
+require('dotenv').config(); 
+const path = require('path'); 
 const {
-    getStorage, // Function to get the storage service
-    ref, // Function to create a reference to a storage location
-    getDownloadURL, // Function to get the download URL of a file
-    uploadBytesResumable, // Function for uploading files with resumable support
-    deleteObject, // Function to delete a file from storage
-    getBytes // Function to get the bytes of a file from storage
+    getStorage,
+    ref, 
+    getDownloadURL,
+    uploadBytesResumable,
+    deleteObject, 
+    getBytes, 
+    uploadBytes
 } = require('firebase/storage');
 
-const Directory = require('../models/directory'); // Directory model for database interactions
+const Directory = require('../models/directory'); 
 
-// Initialize Firebase with the provided configuration
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
     authDomain: process.env.FIREBASE_AUTH_DOMAIN,
@@ -28,41 +28,39 @@ const firebaseConfig = {
 
 // Initialize Firebase app
 firebase.initializeApp(firebaseConfig);
-const storage = getStorage(); // Get the storage service
+const storage = getStorage(); 
 
-// Function to upload a file to Firebase Storage for a user
 const uploadFileToStorage = async (user_id, file) => {
     try {
-        const { mimetype, buffer, originalname } = file; // Destructure the file to get its mimetype and buffer
-        const storageRef = ref(storage, `users/${user_id}/${originalname}`); // Create a reference to the storage location
+        const { mimetype, buffer, originalname } = file;
+        const storageRef = ref(storage, `users/${user_id}/${originalname}`); 
         const metadata = {
-            contentType: mimetype // Set the content type for the uploaded file
+            contentType: mimetype 
         };
-        // Upload the file with resumable upload
+
         await uploadBytesResumable(storageRef, buffer, metadata);
-        // Get the download URL for the uploaded file
+
         const fileUrl = await getDownloadURL(storageRef);
-        return fileUrl; // Return the download URL
+        return fileUrl; 
     } catch (error) {
-        throw error; // Throw error if upload fails
+        throw error; 
     }
 };
 
 const uploadMultipleFilesToGroup = async (user_id, files) => {
     try {
-        const fileUrls = []; // Initialize an array to hold all file URLs
+        const fileUrls = []; 
         for (const file of files) {
             const { originalname, mimetype, buffer } = file;
             const fileUrl = await uploadFileToStorage(user_id, { originalname, mimetype, buffer });
-            fileUrls.push(fileUrl); // Append each file URL to the array
+            fileUrls.push(fileUrl);
         }
-        return fileUrls; // Return the array of all uploaded file URLs
+        return fileUrls; 
     } catch (error) {
         console.error('Error uploading multiple files:', error);
         throw error;
     }
 };
-
 
 const uploadMultipleFilesToGroupV2 = async (user_id, file) => {
     try {
@@ -75,15 +73,45 @@ const uploadMultipleFilesToGroupV2 = async (user_id, file) => {
     }
 };
 
-
 // Function to delete a file from Firebase Storage
 const deleteFileFromStorage = async (user_id, filename) => {
     try {
-        const storageRef = ref(storage, `users/${user_id}/${filename}`); // Create a reference to the file to delete
-        await deleteObject(storageRef); // Delete the file
+        const storageRef = ref(storage, `users/${user_id}/${filename}`);
+        await deleteObject(storageRef);
+        console.log(`File ${filename} deleted successfully for user ${user_id}`);
     } catch (error) {
-        throw error; // Throw error if deletion fails
+        if (error.code === 'storage/object-not-found') {
+            console.log(`File ${filename} not found for user ${user_id}, skipping deletion.`);
+        } else {
+            console.error('Error deleting file:', error);
+            throw error;
+        }
     }
+};
+
+
+const moveFileToUserGroup = async (user_id, filename) => {
+    try {
+        console.log('Uploading...')
+        const storageRef = ref(storage, `users/${user_id}/${filename}`);
+
+        const destinationRef = ref(storage, `users/${user_id}/shared/${filename}`);
+
+        const url = await getDownloadURL(storageRef);
+
+        const response = await fetch(url);
+
+        const blob = await response.blob();
+
+        await uploadBytes(destinationRef, blob);
+
+        const downloadURL = await getDownloadURL(destinationRef);
+        return downloadURL;
+
+    } catch (error) {
+        console.error("Error moving file:", error);
+        throw error; 
+    }0
 };
 
 
@@ -91,25 +119,26 @@ const deleteFileFromStorage = async (user_id, filename) => {
 const deleteFilesInDirectory = async (user_id, fileIds, session) => {
     try {
         for (const fileId of fileIds) {
-            // Attempt to delete each file by ID
+
             const fileExisted = await File.findByIdAndDelete(fileId, { session });
             if (!fileExisted) {
-                continue; // Skip if the file does not exist or has already been deleted
+                continue; 
             }
 
             // Find the directory containing the deleted file
             const fileDirectory = await Directory.findById(fileExisted.directoryId).session(session);
             if (fileDirectory) {
-                fileDirectory.files.pull(fileId); // Remove the file ID from the directory's files array
-                await fileDirectory.save(); // Save the updated directory
+                fileDirectory.files.pull(fileId); 
+                await fileDirectory.save(); 
             } 
-            // Delete the file from storage
+
             await deleteFileFromStorage(user_id, fileExisted.originalname);
         }
     } catch (error) {
-        throw error; // Throw error if deletion fails
+        throw error; 
     }
 };
+
 
 // Export the functions for use in other modules
 module.exports = {
@@ -117,5 +146,6 @@ module.exports = {
     deleteFilesInDirectory,
     deleteFileFromStorage,
     uploadMultipleFilesToGroupV2,
-    uploadMultipleFilesToGroup
+    uploadMultipleFilesToGroup,
+    moveFileToUserGroup,
 };

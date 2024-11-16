@@ -1,85 +1,124 @@
 const { Worker } = require('worker_threads');
 const path = require('path');
-const { io, getUserSocket } = require('../../socket/socket');
-const { File } = require('../../controllers/file/configurations');
+const mongoose = require('mongoose');
+const { File, Directory } = require('../../controllers/file/configurations');
 
 async function handleFileUploadWorker(userId, file) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   const worker = new Worker(path.resolve(__dirname, 'fileUploadWorker.js'), {
     workerData: { userId, file },
   });
-
-  // Helper function to emit socket events safely
-  function emitToUser(userId, event, data) {
-    const userSocket = getUserSocket(userId);
-    if (userSocket) {
-      io.to(userSocket).emit(event, data);
-    } else {
-      console.warn(`No active socket for user ${userId}`);
-    }
-  }
 
   worker.on('message', async (result) => {
     if (result.success) {
       const fileUrl = result.url;
 
       try {
+
         const fileRecord = await File.findOneAndUpdate(
           { name: file.originalname, user_id: userId },
           { url: fileUrl.toString() },
-          { new: true } 
+          { new: true, session }
         );
 
         if (!fileRecord) {
           console.error(`File not found for name: ${file.originalname} and user_id: ${userId}`);
-          emitToUser(userId, 'fileUploadError', {
-            name: file.originalname,
-            message: 'Error: file record not found in the database.',
-          });
+          await session.abortTransaction();
           return;
         }
-        // Notify client of successful upload
-        emitToUser(userId, 'fileUploadComplete', {
-          name: file.originalname,
-          url: fileUrl,
-          message: 'File uploaded successfully',
-        });
+
+        console.log(`File upload complete: ${fileUrl}`);
+        await session.commitTransaction(); 
+
       } catch (dbError) {
         console.error('Database update failed:', dbError);
-        emitToUser(userId, 'fileUploadError', {
-          name: file.originalname,
-          message: 'Error updating file record in database.',
-        });
+        await session.abortTransaction(); 
+      } finally {
+        session.endSession(); 
       }
+
     } else {
-      emitToUser(userId, 'fileUploadError', {
-        name: file.originalname,
-        message: `Error uploading file: ${result.error}`,
-      });
+      console.error(`File upload failed: ${result.error}`);
 
       try {
-        await File.findOneAndDelete({
-          name: file.originalname,
-          user_id: userId,
-        });
+        const file = await File.findOneAndDelete(
+          { name: file.originalname, user_id: userId },
+          { session }
+        );
+
+        if (file) {
+          const fileDirectory = await Directory.findById(file.directoryId).session(session);
+          if (fileDirectory) {
+            fileDirectory.files.pull(file._id);
+            await fileDirectory.save({ session });
+          }
+        }
+
+        await session.commitTransaction(); 
+
       } catch (deleteError) {
         console.error('Failed to delete file record:', deleteError);
+        await session.abortTransaction(); 
+      } finally {
+        session.endSession();
       }
     }
   });
 
-  worker.on('error', (error) => {
-    emitToUser(userId, 'fileUploadError', {
-      name: file.originalname,
-      message: `Worker error: ${error.message}`,
-    });
+  worker.on('error', async (error) => {
+    console.error('Worker encountered an error:', error);
+
+    try {
+
+      const file = await File.findOneAndDelete(
+        { name: file.originalname, user_id: userId },
+        { session }
+      );
+
+      if (file) {
+        const fileDirectory = await Directory.findById(file.directoryId).session(session);
+        if (fileDirectory) {
+          fileDirectory.files.pull(file._id);
+          await fileDirectory.save({ session });
+        }
+      }
+
+      await session.abortTransaction(); 
+
+    } catch (deleteError) {
+      console.error('Failed to delete file record on worker error:', deleteError);
+    } finally {
+      session.endSession(); 
+    }
   });
 
-  worker.on('exit', (code) => {
+  worker.on('exit', async (code) => {
     if (code !== 0) {
-      emitToUser(userId, 'fileUploadError', {
-        name: file.originalname,
-        message: `Worker stopped with exit code ${code}`,
-      });
+      console.error(`Worker stopped with exit code ${code}`);
+
+      try {
+        const file = await File.findOneAndDelete(
+          { name: file.originalname, user_id: userId },
+          { session }
+        );
+
+        if (file) {
+          const fileDirectory = await Directory.findById(file.directoryId).session(session);
+          if (fileDirectory) {
+            fileDirectory.files.pull(file._id);
+            await fileDirectory.save({ session });
+          }
+        }
+
+        await session.abortTransaction();
+
+      } catch (deleteError) {
+        console.error('Failed to delete file record on worker exit:', deleteError);
+      } finally {
+        session.endSession(); 
+      }
     }
   });
 }

@@ -5,10 +5,8 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
     const specificDirectoryExist = data?.subDirectories?.map((value) => {
       const { _id, parentDirectory, name, mimetype, size, lastUpdated, subDirectories, files, privateDirectory } = value;
   
-      // Calculate the total number of subDirectories and files
       let totalSize = (subDirectories?.length || 0) + (files?.length || 0);
   
-      // Return a new object with the transformed properties
       return {
         _id,
         parentDirectory,
@@ -23,7 +21,7 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
     }) || [];
   
     const specificFilesExist = data?.files?.map((value) => {
-      const { _id, directoryId, name, mimetype, url, size, user_id, lastUpdated } = value;
+      const { _id, directoryId, name, mimetype,shared, url, size, user_id, lastUpdated } = value;
   
       return {
         _id,
@@ -33,6 +31,7 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
         mimetype,
         size,
         user_id,
+        shared,
         lastUpdated
       };
     }) || [];
