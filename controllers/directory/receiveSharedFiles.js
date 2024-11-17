@@ -14,7 +14,6 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
     const { secreteCode } = req.body;
     const user = req.user
 
-    console.log('secreteCode',secreteCode)
     const session = await mongoose.startSession();
     session.startTransaction();
 

@@ -4,7 +4,6 @@ const cors = require('cors');
 const bodyparser = require('body-parser');
 require('dotenv').config();
 require('express-async-errors');
-const methodOverride = require('method-override');
 const PORT = process.env.PORT || 4000;
 
 // CORS setup
@@ -17,7 +16,6 @@ app.use(cors({
 
 // Middleware setup
 app.use(bodyparser.json());
-app.use(methodOverride('_method'));
 app.use(bodyparser.urlencoded({ extended: false }));
 
 // Routes
@@ -26,8 +24,8 @@ app.use('/api/v1', require('./routes/directory'));
 app.use('/api/v1', require('./routes/files'));
 
 // Custom middleware for handling errors
-app.use(require('./middleware/notFound'));
 app.use(require('./middleware/errorMiddleware'));
+app.use(require('./middleware/notFound'));
 
 // Start server
 const start = async () => {

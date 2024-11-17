@@ -16,14 +16,14 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
     const { fileIds } = req.body; 
     const user = req.user;
 
-    console.log('fileids', fileIds);
-
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
         let duplicatedFiles = [];
         let rejectedFiles = [];
+        let sharedFilesList = [];
+        let moveFileDetails = []
 
         for (const file of fileIds) {
             const fileExist = await File.findById(file);
@@ -36,24 +36,50 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
 
         const userSharedFilesDirectory = await Directory.findOne({ user_id: user, name: 'SharedFiles' });
 
-        const editedDuplicatedFiles = duplicatedFiles.map(value => ({
-            name: `${value.name}`,
-            shared: true,
-            user_id: user,
-            mimetype: value.mimetype,
-            directoryId: userSharedFilesDirectory._id,
-            size: value.size,
-        }));
+        duplicatedFiles.forEach((value)=>{
+            if(value.shared){
+                const sharedFiles = {
+                    name: `${value.name}`,
+                    shared: value.shared,
+                    user_id: user,
+                    url:value.url,
+                    mimetype: value.mimetype,
+                    directoryId: userSharedFilesDirectory._id,
+                    size: value.size,
+                }
 
-        const createdDuplicatedFiles = await File.insertMany(editedDuplicatedFiles, { session });
+                sharedFilesList.push(sharedFiles)
+            } else {
+                const newlyDuplicatedFiles = {
+                    name: `${value.name}`,
+                    shared: true,
+                    user_id: user,
+                    url:value.url,
+                    mimetype: value.mimetype,
+                    directoryId: userSharedFilesDirectory._id,
+                    size: value.size,
+                }
+                
+                sharedFilesList.push(newlyDuplicatedFiles)
 
+            }
+            
+        })        
 
-        const moveFileDetails = createdDuplicatedFiles.map(file => ({
-            fileId: file._id,
-            filename: file.name,
-            userId: user
-        }));
+        const createdDuplicatedFiles = await File.insertMany(sharedFilesList, { session });
 
+        for (const file of createdDuplicatedFiles) {
+            const regex = /2Fshared/;
+            if (regex.test(file.url)) {
+                continue;
+            }
+            moveFileDetails.push({
+                fileId: file._id,
+                filename: file.name,
+                userId: user
+            });
+        }
+    
         const idsOfEditedDuplicated = createdDuplicatedFiles.map(file => file._id);
 
         const randomString = `${generateRandomString(8)}@sr`;

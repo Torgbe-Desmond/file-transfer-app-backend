@@ -109,7 +109,7 @@ const moveFileToUserGroup = async (user_id, filename) => {
         return downloadURL;
 
     } catch (error) {
-        console.error("Error moving file:", error);
+        console.error("Error moving file:", error._baseMessage);
         throw error; 
     }0
 };

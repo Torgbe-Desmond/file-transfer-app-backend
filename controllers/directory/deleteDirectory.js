@@ -57,8 +57,6 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
 
         console.info('Done with schema deletion..')
 
-
-
         // Delete files from storage
         for (const { name, user_id } of deletedFiles) {
             await deleteFileFromStorage(user_id, name);
