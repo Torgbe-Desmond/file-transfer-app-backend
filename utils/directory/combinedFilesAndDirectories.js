@@ -3,7 +3,7 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
     let combinedFilesAndDirectories = [];
   
     const specificDirectoryExist = data?.subDirectories?.map((value) => {
-      const { _id, parentDirectory, name, mimetype, size, lastUpdated, subDirectories, files, privateDirectory } = value;
+      const { _id, parentDirectory, name, mimetype, size, lastUpdated, subDirectories, files, privateDirectory,secreteCode } = value;
   
       let totalSize = (subDirectories?.length || 0) + (files?.length || 0);
   
@@ -16,7 +16,8 @@ module.exports.combinedFilesAndDirectories = ({ data }) => {
         size: totalSize,
         lastUpdated,
         subDirectories,
-        files
+        files,
+        secreteCode
       };
     }) || [];
   

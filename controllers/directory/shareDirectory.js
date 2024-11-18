@@ -13,7 +13,7 @@ const {
 } = require('./configurations');
 
 const shareDirectory = expressAsyncHandler(async (req, res) => {
-    const { fileIds } = req.body; 
+    const { fileIds, name } = req.body; 
     const user = req.user;
 
     const session = await mongoose.startSession();
@@ -87,11 +87,12 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
         const [sharedReference] = await Directory.create(
             [
                 {
-                    name: randomString,
+                    name: name,
                     user_id: user,
                     parentDirectory: userSharedFilesDirectory._id,
                     files: idsOfEditedDuplicated,
-                    mimetype:"Shared"
+                    mimetype:"Shared",
+                    secreteCode:randomString
                 },
             ],
             { session }

@@ -11,6 +11,7 @@ const directorySchema = new Schema({
     interfaceId:{type:Schema.Types.ObjectId, ref:'PrivateInterface'},
     lastUpdated: { type: Date, default: Date.now }, 
     size: { type: Number, default: 0 },
+    secreteCode : { type:String, }
 });
 
 

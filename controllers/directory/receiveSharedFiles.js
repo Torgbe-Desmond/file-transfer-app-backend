@@ -25,7 +25,7 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
             throw new NotFound('Directory not found.');
         }
 
-        const sharedFilesExist = await Directory.findOne({name:secreteCode}).populate('files');
+        const sharedFilesExist = await Directory.findOne({secreteCode:secreteCode}).populate('files');
 
         if(!sharedFilesExist){
             throw new NotFound('Shared files not found.');
