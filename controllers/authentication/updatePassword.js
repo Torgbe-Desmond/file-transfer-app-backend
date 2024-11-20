@@ -6,8 +6,11 @@ module.exports.updatePassword = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   
+  console.log('user_id',user_id)
+
   try {
     const { newPassword } = req.body;
+    console.log('newPassword',newPassword)
 
     if (!password) throw new BadRequest('Please provide a password');
 
