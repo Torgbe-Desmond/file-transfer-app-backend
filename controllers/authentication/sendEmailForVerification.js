@@ -17,7 +17,7 @@ module.exports.sendEmailForVerification = asyncHandler(async (req, res) => {
       username: userExist.username,
       to: [userExist.email],
       subject: 'Student Rep Email Verification',
-      verificationLink: `https://student-rep.vercel.app/${userExist.reference_Id}/forgot-password/`,
+      verificationLink: `https://student-rep.vercel.app/${userExist.reference_Id}/update-password/`,
     };
 
     await sendEmaiToRecipient(verification); 
