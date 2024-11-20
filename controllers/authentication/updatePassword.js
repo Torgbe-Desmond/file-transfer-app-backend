@@ -6,13 +6,10 @@ module.exports.updatePassword = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   
-  console.log('user_id',user_id)
-
   try {
     const { newPassword } = req.body;
-    console.log('newPassword',newPassword)
 
-    if (!password) throw new BadRequest('Please provide a password');
+    if (!newPassword) throw new BadRequest('Please provide a password');
 
     const userExist = await User.findById(user_id);
 
@@ -20,11 +17,13 @@ module.exports.updatePassword = asyncHandler(async (req, res) => {
 
     const hashedPassword = await bcryptjs.hash(newPassword, 10);
 
-    await User.findByIdAndUpdate(
+    const updatedPassword = await User.findByIdAndUpdate(
       user_id, 
       { password: hashedPassword }, 
       { session }
     );
+
+    console.log('updatedPassword',updatedPassword)
 
     await session.commitTransaction();
 

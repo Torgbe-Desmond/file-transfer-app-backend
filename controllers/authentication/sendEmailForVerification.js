@@ -13,11 +13,16 @@ module.exports.sendEmailForVerification = asyncHandler(async (req, res) => {
     const userExist = await User.findOne({ email });
     if (!userExist) throw new BadRequest('No such user');
 
+    const url = [
+        'https://student-rep.vercel.app',
+        'http://localhost:3000'
+    ]
+
     const verification = {
       username: userExist.username,
       to: [userExist.email],
       subject: 'Student Rep Email Verification',
-      verificationLink: `https://student-rep.vercel.app/${userExist.reference_Id}/update-password/`,
+      verificationLink: `${url[0]}/${userExist.reference_Id}/update-password/`,
     };
 
     await sendEmaiToRecipient(verification); 
