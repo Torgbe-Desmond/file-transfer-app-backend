@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { forgotPassword } = require('../controllers/authentication/forgotPassword')
+const {  updatePassword } = require('../controllers/authentication/updatePassword')
 const { getAll } = require('../controllers/authentication/getAll')
 const { loginUser } = require('../controllers/authentication/login')
 const { registerUser } = require('../controllers/authentication/register')
@@ -7,6 +7,8 @@ const { sendRecoveryLink } = require('../controllers/authentication/sendRecovery
 const deleteUser = require('../controllers/authentication/delete')
 const protect = require('../middleware/protectRoutes')
 const logout = require('../controllers/authentication/Logout')
+const { sendEmailForVerification } = require('../controllers/authentication/sendEmailForVerification')
+const { generateTokenForVerification } = require('../controllers/authentication/generateTokenForVerification')
 
 router.post('/login', loginUser)
 
@@ -16,9 +18,13 @@ router.post('/delete', protect,deleteUser)
 
 router.get('/recovery', sendRecoveryLink)
 
-router.post('/forgot-password',protect, forgotPassword)
+router.post('/update-password',protect, updatePassword)
 
 router.get('/all', getAll)
+
+router.get('/:reference_Id/get-verification-token',  generateTokenForVerification)
+
+router.post('/send-email-verification', sendEmailForVerification)
 
 router.post('/logout',logout)
 
