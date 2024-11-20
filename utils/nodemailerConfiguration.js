@@ -3,10 +3,6 @@ const ejs = require('ejs');
 const path = require('path');
 require('dotenv').config();
 
-if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
-  console.error('Missing required environment variables.');
-  process.exit(1);
-}
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -20,8 +16,6 @@ const transporter = nodemailer.createTransport({
 
 async function sendEmaiToRecipient({ username, verificationLink, subject, to }) {
   const templatePath = path.join(__dirname, 'views', 'password-verification.ejs');
-
-  console.log('path',templatePath)
 
   const htmlContent = await ejs.renderFile(templatePath, { username, verificationLink });
 
