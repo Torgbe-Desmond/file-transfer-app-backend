@@ -23,7 +23,7 @@ module.exports.updatePassword = asyncHandler(async (req, res) => {
       { session }
     );
 
-    console.log('updatedPassword',updatedPassword)
+    // console.log('updatedPassword',updatedPassword)
 
     await session.commitTransaction();
 

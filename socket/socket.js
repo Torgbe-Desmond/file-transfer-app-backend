@@ -1,63 +1,120 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const User = require('../models/user');
+const { users } = require('./functions/users');
+
+
 const app = express();
 const server = http.createServer(app);
 
-class ConnectionManager {
-    constructor(server) {
-        this.io = new Server(server, {
-            cors: {
-                origin: ['https://student-rep.vercel.app', 'http://localhost:3000'],
-                methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-                allowedHeaders: ['Content-Type', 'Authorization'],
-                credentials: true,
-            },
-        });
+// Socket.io initialization
+const io = new Server(server, {
+    cors: {
+        origin: ['https://student-rep.vercel.app', 'http://localhost:3000'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        credentials: true,
+    },
+});
 
-        this.userSocketMap = {};
+// Handle user connection
+const handleUserConnection = async (socket, userData) => {
+    try {
+        const { reference_Id } = userData || {};
+        if (!reference_Id) {
+            console.error('Missing reference_Id in userData');
+            return;
+        }
 
-        this.setupSocketListeners();
-    }
+        console.log(`Reference ID received: ${reference_Id}`);
 
-    getUserSocket(userId) {
-        return this.userSocketMap[userId];
-    }
+        const userExist = await User.findOne({ reference_Id });
+        if (!userExist) {
+            console.warn(`No user found with reference_Id: ${reference_Id}`);
+            return;
+        }
 
-    handleUserConnection(socket, userData) {
-        const { userId } = userData;
-        if (userId) {
-            this.userSocketMap[userId] = socket.id;
+        const userId = userExist._id.toString();
+        const existingUser = users.find((user) => user.userId === userId);
+
+        if (!existingUser) {
+            users.push({ userId, socketId: socket.id });
+            console.log(users);
             console.log(`User connected: ${userId} with socket ID: ${socket.id}`);
-        }
-    }
-
-    handleDisconnection(socket) {
-        for (const [userId, socketId] of Object.entries(this.userSocketMap)) {
-            if (socketId === socket.id) {
-                delete this.userSocketMap[userId];
-                console.log(`User disconnected: ${userId}`);
+        } else {
+            console.log(`User already connected: ${userId}`);
+            const userIndex = users.findIndex(user => user.userId === userId);
+            if (userIndex !== -1) {
+                users[userIndex] = {
+                    ...users[userIndex],
+                    socketId: socket.id,
+                };
             }
+            console.log(users); 
         }
+        
+    } catch (error) {
+        console.error('Error handling user connection:', error);
     }
+};
 
-    setupSocketListeners() {
-        this.io.on('connection', (socket) => {
-            // Handle user connection
-            socket.on('user', (userData) => {
-                this.handleUserConnection(socket, userData);
-            });
+// handle emit socket
+// const emitProgress = (process,error = null, file, user_id) => {
+//     const existingUser = users?.find((user) => user.userId == socketId);
+//     if (!existingUser) {
+//         console.error(`Invalid socketId: ${socketId}`);
+//         return;
+//     }
 
-            // Handle user disconnection
-            socket.on('disconnect', () => {
-                this.handleDisconnection(socket);
-            });
+//     console.log(`Emitting progress to socketId: ${socketId}`);
+//     io.to(existingUser.socketId).emit('uploading', {
+//         process,
+//         file: file?.originalname || 'Unknown file',
+//         error,
+//     });
+// };
+
+
+// Handle socket disconnection
+const handleDisconnection = (socket) => {
+    try {
+        const userIndex = users.findIndex((user) => user.socketId === socket.id);
+
+        if (userIndex !== -1) {
+            const disconnectedUser = users[userIndex];
+            users.splice(userIndex, 1);
+            console.log(`User disconnected: ${disconnectedUser.userId}`);
+        }
+    } catch (error) {
+        console.error('Error handling disconnection:', error);
+    }
+};
+
+// Set up socket event listeners
+const setupSocketListeners = () => {
+    io.on('connection', (socket) => {
+        console.log('New socket connection established:', socket.id);
+
+        try {
+            const userData = JSON.parse(socket.handshake.query.userData || '{}');
+            handleUserConnection(socket, userData);
+        } catch (error) {
+            console.error('Invalid userData in handshake query:', error);
+        }
+
+        socket.on('disconnect', () => {
+            handleDisconnection(socket);
         });
-    }
-}
+    });
+};
 
-// Instantiate ConnectionManager
-const connectionManager = new ConnectionManager(server);
+// Initialize socket listeners
+setupSocketListeners();
 
-// Export `io` and the `getUserSocket` method for external use
-module.exports = { io: connectionManager.io, getUserSocket: connectionManager.getUserSocket.bind(connectionManager), app, server };
+// Export io and related modules
+module.exports = {
+    io,
+    app,
+    server,
+};

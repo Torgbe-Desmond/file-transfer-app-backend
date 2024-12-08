@@ -1,47 +1,83 @@
-const { Directory, mongoose, asyncHandler, deleteDirectoryRecursive } = require('./configurations');
+const { deleteDirectoryTree } = require('../../utils/directory/deleteDirectoryRecursive');
+const getDirectoryTree = require('../../utils/directory/getDirectoryTree');
+const { deleteFileFromStorage } = require('../../utils/FirebaseInteractions');
+const { Directory, mongoose, asyncHandler, NotFound, StatusCodes } = require('./configurations');
 
-// Function to delete a user, wrapped with asyncHandler to handle async errors
  const deleteUser = asyncHandler(async (req, res) => {
-  const user_id = req.user;  // Get the user's ID from the request
+  const user_id = req.user; 
+  const parentDirectory = req.params.reference_Id; 
 
-  // Start a new session for transactions
   const session = await mongoose.startSession();
-  session.startTransaction();  // Begin the transaction
+  session.startTransaction();  
 
   try {
-    // Define the main directories for the user that should be deleted
-    const mainDirectories = ["Home", "Subscriptions"];
 
-    let idsOfMainDirectories = [];
+    const userExist = await User.findById(user_id);
 
-    // Fetch the IDs of the main directories ('Home' and 'Subscriptions') for the user
-    for (const folderNames of mainDirectories) {
-      const folder = await Directory.findOne({ user_id, name: folderNames });
-      idsOfMainDirectories.push(folder._id);  // Push the found folder's ID to the array
+    if(!userExist){
+      throw new NotFound('User not found.')
     }
 
-    // Loop through the fetched main directory IDs to delete them
-    for (const dirId of idsOfMainDirectories) {
-      const directory = await Directory.findById(dirId).session(session);  // Fetch directory within the session
+    const mainDirectories = await Directory.find({ parentDirectory });
 
-      // If directory is not found, skip to the next directory
-      if (!directory) {
-        // Directory doesn't exist, continue to next iteration
-        continue;
-      }
-
-      // Delete the directory recursively, passing the user ID, directory ID, parent directory, and session
-      await deleteDirectoryRecursive(user_id, dirId, directory.parentDirectory, session);
+    if (mainDirectories.length === 0) {
+      throw new NotFound('No directories found for the user.');
     }
 
-    // If everything goes well, commit the transaction
+    let directoryIds = mainDirectories.map((dir)=>dir._id);
+    
+    let rootDirectoriesInParentDirectory = [];
+    let deletedFiles = [];
+
+    for (const directoryId of directoryIds) {
+        console.info('Deletiong started..')
+        const directoryExist = await Directory.findById(directoryId).session(session);
+
+        if (!directoryExist) {
+            throw new NotFound(`Directory with ID ${directoryId} not found.`);
+        }
+
+        const directoryTreeObject = await getDirectoryTree(directoryExist._id, session);
+
+        if (directoryTreeObject) {
+
+            const parentDir = directoryTreeObject.directoriesToDelete.shift();
+            rootDirectoriesInParentDirectory.push(parentDir);
+
+            const deletedResults = await deleteDirectoryTree(directoryTreeObject, session);
+            deletedFiles.push(...deletedResults);
+        }
+
+        const { directoriesToDelete, filesToDelete } = directoryTreeObject;
+
+        if (directoriesToDelete.length > 0) {
+            directoryExist.subDirectories.pull(...directoriesToDelete);
+        }
+        if (filesToDelete.length > 0) {
+            directoryExist.files.pull(...filesToDelete); 
+        }
+
+        await directoryExist.save({ session });
+    }
+
+    console.info('Done with schema deletion..')
+
+    for (const { name, user_id } of deletedFiles) {
+        await deleteFileFromStorage(user_id, name);
+    }
+
+    Directory.deleteMany({ _id: { $in: rootDirectoriesInParentDirectory } }, { session });
+
+    await User.findByIdAndDelete(user_id);
+
     await session.commitTransaction();
+
+    res.status(StatusCodes.OK).json({message:'Account was deleted succesfully'});
+
   } catch (error) {
-    // If any error occurs, abort the transaction
     session.abortTransaction();
-    throw error;  // Re-throw the error to be handled by asyncHandler
+    throw error;  
   } finally {
-    // End the session, whether successful or failed
     session.endSession();
   }
 });

@@ -27,8 +27,8 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
         
         const { files } = await _handleFileCreation(user_id, req.files, directoryId);
 
-        // Filter out files that already exist
         const filesToInsert = [];
+
         for (const file of files) {
             const fileExist = await File.findOne({ name: file.name }).session(session);
             if (!fileExist) {
@@ -38,22 +38,19 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
             }
         }
 
-        // Insert files in bulk if there are new files
         let createdFiles = [];
+        
         if (filesToInsert.length > 0) {
             createdFiles = await File.insertMany(filesToInsert, { session });
         }
 
-        // Add created file IDs to the directory
         const newFileIds = createdFiles.map(file => file._id);
         directoryExist.files.push(...newFileIds);
 
-        // Save the updated directory
         await directoryExist.save({ session });
 
         await session.commitTransaction();
 
-        // Return the inserted files as the response
         res.status(StatusCodes.CREATED).json({ files: createdFiles });
 
     } catch (error) {

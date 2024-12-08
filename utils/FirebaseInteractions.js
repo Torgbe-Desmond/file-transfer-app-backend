@@ -15,6 +15,9 @@ const {
 } = require('firebase/storage');
 
 const Directory = require('../models/directory'); 
+const User = require('../models/user');
+// const { io } = require('../socket/socket');
+// const { emitProgress } = require('./file/test');
 
 const firebaseConfig = {
     apiKey: process.env.FIREBASE_API_KEY,
@@ -30,23 +33,62 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const storage = getStorage(); 
 
+
 const uploadFileToStorage = async (user_id, file) => {
     try {
-        const { mimetype, buffer, originalname } = file;
-        const storageRef = ref(storage, `users/${user_id}/${originalname}`); 
-        const metadata = {
-            contentType: mimetype 
-        };
 
-        await uploadBytesResumable(storageRef, buffer, metadata);
-
-        const fileUrl = await getDownloadURL(storageRef);
-        return fileUrl; 
+   
+  
+    //   emitProgress(0,null,file,socketId);
+      console.info(`🔃 Starting upload for ${file?.originalname || "Unknown file"}...`);
+  
+      const { mimetype, buffer, originalname } = file;
+  
+      // Step 1: Prepare metadata
+    //   emitProgress(1,null,file,socketId);
+      console.info(`🔃 Preparing metadata [1/5]`);
+  
+      const storageRef = ref(storage, `users/${user_id}/${originalname}`);
+      const metadata = {
+        contentType: mimetype,
+      };
+  
+      // Step 2: Upload file to storage
+    //   emitProgress(2,null,file,socketId);
+      console.info(`🔃 Uploading file to storage [2/5]`);
+      await uploadBytesResumable(storageRef, buffer, metadata);
+  
+      // Step 3: Retrieve download URL
+    //   emitProgress(3,null,file,socketId);
+      console.info(`🔃 Retrieving download URL [3/5]`);
+      const fileUrl = await getDownloadURL(storageRef);
+  
+      if (!fileUrl) {
+        throw new Error(`Failed to retrieve download URL for ${originalname}`);
+      }
+  
+    //   emitProgress(4,null,file,socketId);
+      console.info(`🔃 Upload completed [4/5]`);
+  
+      // Step 4: Final confirmation
+    //   emitProgress(5,null,file,socketId);
+      console.info(`✅ Upload successful for ${originalname} [5/5]`);
+  
+      return fileUrl;
     } catch (error) {
-        throw error; 
+      console.error(`❌ Upload failed for ${file?.originalname || "Unknown file"}: ${error.message}`);
+    //   io.to(user_id).emit('uploading', {
+    //     process: 0,
+    //     file: file?.originalname || "Unknown file",
+    //     error: error.message,
+    //   });
+    //   emitProgress(5,error.message,file,socketId);
+      throw error; 
     }
-};
+  };
+  
 
+// Function to upload mutiple files to group
 const uploadMultipleFilesToGroup = async (user_id, files) => {
     try {
         const fileUrls = []; 
@@ -89,7 +131,7 @@ const deleteFileFromStorage = async (user_id, filename) => {
     }
 };
 
-
+ // Function to move files to user group
 const moveFileToUserGroup = async (user_id, filename) => {
     try {
         console.log('Uploading...')
@@ -125,7 +167,6 @@ const deleteFilesInDirectory = async (user_id, fileIds, session) => {
                 continue; 
             }
 
-            // Find the directory containing the deleted file
             const fileDirectory = await Directory.findById(fileExisted.directoryId).session(session);
             if (fileDirectory) {
                 fileDirectory.files.pull(fileId); 

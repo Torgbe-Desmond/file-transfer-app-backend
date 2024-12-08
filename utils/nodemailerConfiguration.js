@@ -3,7 +3,6 @@ const ejs = require('ejs');
 const path = require('path');
 require('dotenv').config();
 
-
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 587,

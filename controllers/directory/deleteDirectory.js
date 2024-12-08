@@ -35,7 +35,9 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
 
             const directoryTreeObject = await getDirectoryTree(directoryExist._id, session);
             if (directoryTreeObject) {
+
                 const parentDir = directoryTreeObject.directoriesToDelete.shift();
+
                 rootDirectoriesInParentDirectory.push(parentDir);
                 rootFilesInParentDirectory.push(...directoryTreeObject.filesToDelete);
 
@@ -57,13 +59,11 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
 
         console.info('Done with schema deletion..')
 
-        // Delete files from storage
         for (const { name, user_id } of deletedFiles) {
             await deleteFileFromStorage(user_id, name);
         }
 
-        // Remove directories from the database and update parent directory
-        await Directory.deleteMany({ _id: { $in: rootDirectoriesInParentDirectory } }).session(session);
+        Directory.deleteMany({ _id: { $in: rootDirectoriesInParentDirectory } }, { session });
         parent.subDirectories.pull(...rootDirectoriesInParentDirectory);
         parent.files.pull(...rootFilesInParentDirectory);
 

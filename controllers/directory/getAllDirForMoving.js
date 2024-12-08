@@ -24,6 +24,7 @@ module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
             path:_id,
             label:name
         }));
+        
 
         res.status(StatusCodes.OK).json(editedAllDirectories);
 

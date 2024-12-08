@@ -1,8 +1,7 @@
 const { parentPort, workerData } = require('worker_threads');
 const { uploadFileToStorage } = require('../FirebaseInteractions');
 
-
-const { userId, file } = workerData;
+const { userId, file} = workerData;
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 2000;
@@ -13,6 +12,7 @@ function delay(ms) {
 
 async function uploadFile(retries = MAX_RETRIES) {
     try {
+        console.info(`😊 Atempting upload [${retries}/3]`)
         const fileUrl = await uploadFileToStorage(userId, file);
         parentPort.postMessage({
             success: true,
