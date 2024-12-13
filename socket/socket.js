@@ -8,10 +8,11 @@ const { users } = require('./functions/users');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io initialization
+// Socket.io initialization now
 const io = new Server(server, {
+
     cors: {
-        origin: ['https://student-rep.vercel.app', 'http://localhost:3000'],
+        origin: ["*"],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
@@ -52,7 +53,7 @@ const handleUserConnection = async (socket, userData) => {
                 };
             }
             console.log(users); 
-        }
+        }  
         
     } catch (error) {
         console.error('Error handling user connection:', error);

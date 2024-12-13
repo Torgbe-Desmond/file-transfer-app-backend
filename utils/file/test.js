@@ -52,7 +52,7 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
                 const result = await handleFileUploadWorker(user_id.toString(), file);
                 emitProgress(result,existingUser.socketId);
               } catch (error) {
-                throw new BadRequest(error.message)
+                console.error(error)
               }
          }
          

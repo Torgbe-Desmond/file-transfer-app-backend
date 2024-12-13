@@ -8,7 +8,8 @@ const PORT = process.env.PORT || 5000;
 
 // CORS setup
 app.use(cors({
-    origin: ['https://student-rep.vercel.app','http://localhost:3000'],
+
+    origin: ["*"],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'], 
     credentials: true
@@ -27,7 +28,9 @@ app.use('/api/v1', require('./routes/files'));
 app.use(require('./middleware/errorMiddleware'));
 app.use(require('./middleware/notFound'));
 
-// Start server
+
+
+// Start server now
 const start = async () => {
     try {
         await connectMongoDB(process.env.MONGO_DB_URL);
