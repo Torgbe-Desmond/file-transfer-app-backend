@@ -8,11 +8,10 @@ const { users } = require('./functions/users');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io initialization now
+// Socket.io initialization
 const io = new Server(server, {
-
     cors: {
-        origin: ["*"],
+        origin: ['https://student-rep.vercel.app', 'http://localhost:3000',"http://localhost:56708"],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
