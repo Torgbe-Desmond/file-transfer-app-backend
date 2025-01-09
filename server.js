@@ -5,10 +5,11 @@ const bodyparser = require('body-parser');
 require('dotenv').config();
 require('express-async-errors');
 const PORT = process.env.PORT || 5000;
+    // origin: ['https://student-rep.vercel.app','http://localhost:3000',"http://localhost:56708"],
 
 // CORS setup
 app.use(cors({
-    origin: ['https://student-rep.vercel.app','http://localhost:3000',"http://localhost:56708"],
+    origin:true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'], 
     credentials: true

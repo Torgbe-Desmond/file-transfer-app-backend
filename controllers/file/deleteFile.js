@@ -17,10 +17,16 @@ module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
 
     try {
         let deletedFiles = [];
+        let filesToBeDeletedImmediately = []
 
         for (const fileId of fileIds) {
             const fileExist = await File.findOne({ _id: fileId }).session(session);
-            if (!fileExist) continue;
+            if (!fileExist){
+                continue
+            } else if(fileExist.shared === true){
+                filesToBeDeletedImmediately.push(fileId);
+                continue;
+            }
 
             const fileExisted = await File.findByIdAndDelete(fileId, { session });
             if (fileExisted) {
@@ -35,9 +41,14 @@ module.exports.deleteFile = expressAsyncHandler(async (req, res) => {
             }
         }
 
+
+        if(filesToBeDeletedImmediately && filesToBeDeletedImmediately.length > 0 ){
+            await File.deleteMany({ _id: { $in: filesToBeDeletedImmediately } }).session(session);
+        }
+
         const fileDirectory = await Directory.findById(directoryId).session(session);
         if (fileDirectory) {
-            fileDirectory.files.pull(...deletedFiles);
+            fileDirectory.files.pull(...deletedFiles,...filesToBeDeletedImmediately);
             await fileDirectory.save({ session });
         }
 

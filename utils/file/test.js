@@ -13,7 +13,6 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
-
     try {
         const directoryExist = await Directory.findById(directoryId).session(session);
         if (!directoryExist) {
@@ -54,7 +53,6 @@ module.exports.createFile = expressAsyncHandler(async (req, res) => {
               }
          }
          
-
     } catch (error) {
         await session.abortTransaction();
         throw error;

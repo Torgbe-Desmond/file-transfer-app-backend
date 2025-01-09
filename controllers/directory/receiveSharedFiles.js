@@ -1,13 +1,11 @@
+const {copyFileFromOneUserToAnother } = require('../../utils/FirebaseInteractions');
 const {
     expressAsyncHandler,
-    BadRequest,
     NotFound,
     StatusCodes,
     mongoose,
-    Share,
     File,
     Directory,
-    Secrete
 } = require('./configurations');
 
 const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
@@ -31,19 +29,30 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
             throw new NotFound('Shared files not found.');
         }
 
-        const duplicatedFiles = sharedFilesExist.files.reduce((acc,value) =>{
-            acc.push({
-              name: `${value.name}`,
-              shared: true,
-              user_id:user,
-              url:value.url,
-              mimetype:value.mimetype,
-              directoryId:directoryExist._id,
-              size:value.size
-            })
-            return acc;
-        },[]);
+        let duplicatedFiles = [];
 
+        for (const file of sharedFilesExist.files) {
+                 
+                 const fileExist = await File.findOne({_id:file._id,user_id:file.user_id})
+
+                 if(!fileExist) continue;
+              
+                 const fileUrl = await copyFileFromOneUserToAnother(file?.user_id,user, file?.name);
+                 
+                 const fileObject = {
+                     name: `${file.name}`,
+                     user_id: user,
+                     shared:false,
+                     url: fileUrl,
+                     mimetype: file.mimetype,
+                     directoryId: directoryExist._id,
+                     size: file.size
+                 };
+         
+                 duplicatedFiles.push(fileObject);
+
+        }
+        
         const createSharedFiles = await File.insertMany(duplicatedFiles,{session})
 
         const sharedFilesIds = createSharedFiles.map((file)=>file._id)

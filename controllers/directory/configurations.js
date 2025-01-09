@@ -5,9 +5,7 @@ const { StatusCodes } = require("http-status-codes");
 const mongoose = require('mongoose');
 const payDesmondUtils = require("../../utils");
 const User = require('../../models/user');
-const Share = require('../../models/share')
 const File = require('../../models/files');
-const Secrete = require("../../models/Secrete");
 
 
 module.exports = {
@@ -19,9 +17,7 @@ module.exports = {
     mongoose,
     payDesmondUtils,
     User,
-    Share,
     File,
-    Secrete
     
 };
 

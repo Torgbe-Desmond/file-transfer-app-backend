@@ -1,60 +1,33 @@
 
-const { NotFound } = require('../../Errors');
 const Directory = require('../../models/directory');
 const File = require('../../models/files');
-const { deleteFilesInDirectory } = require('../FirebaseInteractions');
-
-
-// const  deleteDirectoryRecursive = async (user_id, directoryId, parentDirectoryId, session) => {
-//     try {
-//         const directory = await Directory.findById(directoryId).session(session);
-//         if (!directory) {
-//             throw new NotFound(`Directory with ID ${directoryId} not found.`);
-//         }
-
-//         const { subDirectories, files } = directory;
-
-//         if(subDirectories.length > 0) {
-//             for (const subDirId of subDirectories) {
-//                 await deleteDirectoryRecursive(user_id, subDirId, directoryId, session);
-//             }
-//         }
-    
-//         if (files.length > 0) {
-//             await File.deleteMany({ _id: { $in: files } }).session(session);
-//             await deleteFilesInDirectory(user_id, files, session);
-//         }
-      
-//         await Directory.deleteOne({ _id: directoryId }).session(session);
-
-//         if (parentDirectoryId) {
-//             const parentDirectoryExist = await Directory.findById(parentDirectoryId).session(session);
-//             if (parentDirectoryExist) {
-//                 parentDirectoryExist.subDirectories.pull(directoryId);
-//                 await parentDirectoryExist.save();
-//             }
-//         }
-//     } catch (error) {
-//         throw error;
-//     }
-// };
 
 async function deleteDirectoryTree({ filesToDelete, directoriesToDelete }, session) {
     console.info('Deletiong directory tree..')
 
     let fileArrayWithFileObjects = [];
+    let filesToBeDeletedImmediately = []
 
+    // Because the deleteMany API in mongoose does not bring back the items that where deleted
+    // i need to store the name and user_id in the fileArrayWithFileObjects object so that i can
+    // delete them from the storage which is firebase storage
     for(const file of filesToDelete){
         const fileExist = await File.findById(file);
-        if(!fileExist || fileExist.shared===true){
+        if(!fileExist){
+            continue;
+        } else if(fileExist?.shared===true){
+            filesToBeDeletedImmediately.push(file);
             continue;
         }
 
         fileArrayWithFileObjects.push({
             name:fileExist.name,
             user_id:fileExist.user_id
-        })
-        
+        })   
+    }
+
+    if(filesToBeDeletedImmediately && filesToBeDeletedImmediately.length > 0 ){
+        await File.deleteMany({ _id: { $in: filesToBeDeletedImmediately } }).session(session);
     }
 
     if (directoriesToDelete && directoriesToDelete.length > 0) {
