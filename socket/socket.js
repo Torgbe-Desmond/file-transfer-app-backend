@@ -10,7 +10,7 @@ const server = http.createServer(app);
 // Socket.io initialization
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:3000', 'http://localhost:56708',"https://student-rep.vercel.app"],
+        origin: "*",
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
