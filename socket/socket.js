@@ -10,7 +10,7 @@ const server = http.createServer(app);
 // Socket.io initialization
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
