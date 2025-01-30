@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const User = require('../models/user');
-const { userSocketMap,getUserSocket } = require('../socket/functions/users')
+const { userSocketMap, getUserSocket } = require('../socket/functions/users');
 
 const app = express();
 const server = http.createServer(app);
@@ -10,10 +10,11 @@ const server = http.createServer(app);
 // Socket.io initialization
 const io = new Server(server, {
     cors: {
-        origin: ["https://student-rep.vercel.app","http://localhost:3000"],
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true,
+        origin: ["https://student-rep.vercel.app", "http://localhost:3000"],  // Allowed origins (frontend URLs)
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],  // Allowed methods
+        allowedHeaders: ['Content-Type', 'Authorization'],  // Allowed headers
+        transports: ['websocket', 'polling'],  // Ensure both 'websocket' and 'polling' are allowed
+        credentials: true,  // Allow credentials (cookies, authorization headers)
     },
 });
 
