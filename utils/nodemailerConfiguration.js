@@ -14,11 +14,11 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmaiToRecipient({ username, verificationLink, subject, to }) {
-  const templatePath = path.join(__dirname, 'views', 'password-verification.ejs');
+  const templatePath = path.join('views', 'password-verification.ejs');
 
   const htmlContent = await ejs.renderFile(templatePath, { username, verificationLink });
 
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     from: `<${process.env.GMAIL_USER}>`,
     to,
     subject,

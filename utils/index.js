@@ -1,5 +1,5 @@
-const deleteDirectoryRecursive = require('./directory/deleteDirectoryRecursive')
-const generateToken = require('./authentication/generateToken')
+const deleteDirectoryRecursive = require('./deleteDirectoryRecursive')
+const generateToken = require('./generateToken')
 const checkIfTwoArraysAreEqual = require('./checkIfTwoArraysAreEqual')
 
 const {
