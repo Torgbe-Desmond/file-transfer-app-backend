@@ -1,8 +1,8 @@
-const { io, app, server  } = require('./socket/socket')
-const { connectMongoDB } = require('./config/db');
+const { io, app, server  } = require('../socket/socket')
+const { connectMongoDB } = require('../config/db');
 const cors = require('cors');
 const bodyparser = require('body-parser');
-const ErrorHandler = require('./Errors/ErrorHandler')
+const ErrorHandler = require('../Errors/ErrorHandler')
 const Handler = new ErrorHandler()
 require('dotenv').config();
 require('express-async-errors');
@@ -22,11 +22,11 @@ app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({ extended: false }));
 
 // Routes
-app.use(require('./routes/index'));
+app.use(require('../routes/index'));
 
 // Custom middleware for handling errors
-app.use(require('./middleware/errorMiddleware'));
-app.use(require('./middleware/notFound'));
+app.use(require('../middleware/errorMiddleware'));
+app.use(require('../middleware/notFound'));
 
 // Start server
 const start = async () => {
