@@ -12,6 +12,7 @@ const {
 const ErrorHandler = require("../../../Errors/ErrorHandler");
 const asyncHandler = require("express-async-handler");
 const SuccessResponse = require("../../../utils/successResponse");
+const User = require("../model");
 const Handler = new ErrorHandler();
 
 const deleteUser = asyncHandler(async (req, res) => {
