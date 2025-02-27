@@ -33,7 +33,7 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
     }).populate("files");
 
     if (!sharedFilesExist) {
-      throw new NotFound("Shared files not found.", true);
+      throw new NotFound("Shared files not found, provide a valid secret", true);
     }
 
     let duplicatedFiles = [];
@@ -93,4 +93,4 @@ const receiveSharedFiles = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { receiveSharedFiles };
+module.exports = receiveSharedFiles ;

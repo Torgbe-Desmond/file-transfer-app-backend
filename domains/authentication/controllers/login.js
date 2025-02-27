@@ -8,7 +8,7 @@ const Handler = new ErrorHandler()
 const bcryptjs = require('bcryptjs');
 const SuccessResponse = require("../../../utils/successResponse");
 
-module.exports.loginUser = asyncHandler(async (req, res) => {
+const loginUser = asyncHandler(async (req, res) => {
   try {
 
     const { email, password } = req.body;
@@ -42,3 +42,6 @@ module.exports.loginUser = asyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+
+module.exports = loginUser

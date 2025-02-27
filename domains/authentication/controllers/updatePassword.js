@@ -9,7 +9,7 @@ const SuccessResponse = require("../../../utils/successResponse");
 const { addToBlacklist } = require("../../../utils/blackList");
 const Handler = new ErrorHandler();
 
-module.exports.updatePassword = asyncHandler(async (req, res) => {
+const updatePassword = asyncHandler(async (req, res) => {
   const user_id = req.user;
 
   const session = await mongoose.startSession();
@@ -59,3 +59,5 @@ module.exports.updatePassword = asyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+module.exports = updatePassword

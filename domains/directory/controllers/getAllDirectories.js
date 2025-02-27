@@ -6,9 +6,9 @@ const NotFound = require("../../../Errors/Notfound");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
+const getAllDirectories = expressAsyncHandler(async (req, res) => {
   const parentDirectory = req.params.reference_Id;
-  console.log("parentDirectory",parentDirectory)
+  console.log("parentDirectory", parentDirectory);
   try {
     const allDirectories = await Directory.find({ parentDirectory });
 
@@ -42,11 +42,7 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
       }
     );
 
-    const responsObject = new SuccessResponse(
-      true,
-      null,
-      data
-    );
+    const responsObject = new SuccessResponse(true, null, data);
 
     res.status(StatusCodes.OK).json(responsObject);
   } catch (error) {
@@ -56,3 +52,5 @@ module.exports.getAllDirectories = expressAsyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+module.exports = getAllDirectories;

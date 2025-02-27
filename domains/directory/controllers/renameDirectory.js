@@ -8,7 +8,7 @@ const BadRequest = require("../../../Errors/BadRequest");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
+const renameDirectory = expressAsyncHandler(async (req, res) => {
   const { _id, name } = req.body;
 
   if (!_id || !name) {
@@ -61,3 +61,6 @@ module.exports.renameDirectory = expressAsyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+
+module.exports = renameDirectory

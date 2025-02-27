@@ -26,7 +26,7 @@ const moveFiles = expressAsyncHandler(async (req, res) => {
       );
     }
 
-    let data = [];
+    let filesToBeMoved = [];
     let filesNotInTheDatabase = []
     // const targetDirectories = await File.find({ _id: { $in: DirectoriesToMoveFileTo } }).session(session);
 
@@ -50,7 +50,7 @@ const moveFiles = expressAsyncHandler(async (req, res) => {
 
         sourceDirectory.files.pull(fileId);
         targetDirectory.files.push(fileId);
-        data.push(file._id.toString());
+        filesToBeMoved.push(file._id);
         file.directoryId = targetId;
         await file.save({ session });
       }

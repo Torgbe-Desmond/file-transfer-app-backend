@@ -6,7 +6,7 @@ const NotFound = require("../../../Errors/Notfound");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
+const getAllDirForMoving = expressAsyncHandler(async (req, res) => {
   const parentDirectory = req.params.reference_Id;
 
   try {
@@ -42,3 +42,5 @@ module.exports.getAllDirForMoving = expressAsyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+module.exports = getAllDirForMoving

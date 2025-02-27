@@ -12,7 +12,7 @@ const logout = async (req, res) => {
 
     const responsObject = new SuccessResponse(
       true,
-      "Login was succesfully",
+      "Logout was succesfully",
       null
     );
     res.status(StatusCodes.OK).json(responsObject);

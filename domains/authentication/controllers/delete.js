@@ -11,9 +11,8 @@ const {
 } = require("../../../utils/FirebaseInteractions");
 const ErrorHandler = require("../../../Errors/ErrorHandler");
 const asyncHandler = require("express-async-handler");
-const Handler = new ErrorHandler();
 const SuccessResponse = require("../../../utils/successResponse");
-
+const Handler = new ErrorHandler();
 
 const deleteUser = asyncHandler(async (req, res) => {
   const user_id = req.user;

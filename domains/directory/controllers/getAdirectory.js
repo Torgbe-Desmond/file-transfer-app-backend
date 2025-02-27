@@ -7,7 +7,7 @@ const {
 const NotFound = require("../../../Errors/Notfound");
 const SuccessResponse = require("../../../utils/successResponse");
 
-module.exports.getAdirectory = expressAsyncHandler(async (req, res) => {
+const getAdirectory = expressAsyncHandler(async (req, res) => {
   try {
     const _id = req.params.directoryId;
 
@@ -34,3 +34,5 @@ module.exports.getAdirectory = expressAsyncHandler(async (req, res) => {
     throw error;
   }
 });
+
+module.exports = getAdirectory

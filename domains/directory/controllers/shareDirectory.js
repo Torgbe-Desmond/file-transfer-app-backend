@@ -6,6 +6,8 @@ const Directory = require("../model");
 const generateRandomString = require("../../../utils/generateRandomString");
 const File = require("../../file/model");
 const SuccessResponse = require("../../../utils/successResponse");
+const CreateFileObject = require("../../../utils/createFileObject");
+const CreateDirectoryObject = require("../../../utils/createDirectoryObject");
 const Handler = new ErrorHandler();
 
 const shareDirectory = expressAsyncHandler(async (req, res) => {
@@ -33,15 +35,17 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
       name: "SharedFiles",
     });
 
-    const sharedFilesList = duplicatedFiles.map((file) => ({
-      name: `${file.name}`,
-      shared: true,
-      user_id: user,
-      url: file.url,
-      mimetype: file.mimetype,
-      directoryId: userSharedFilesDirectory._id,
-      size: file.size,
-    }));
+    const sharedFilesList = duplicatedFiles.map(
+      (file) =>
+        new CreateFileObject(
+          file, // file object
+          user, //  user id
+          null, // fileUrl
+          userSharedFilesDirectory._id, // directory id
+          null, // file size
+          true // shared status
+        )
+    );
 
     const createdDuplicatedFiles = await File.insertMany(sharedFilesList, {
       session,
@@ -49,21 +53,17 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
 
     const idsOfDuplicatedFiles = createdDuplicatedFiles.map((file) => file._id);
 
-    const randomString = `${generateRandomString(8)}@sr`;
-
-    const [sharedReference] = await Directory.create(
-      [
-        {
-          name: name,
-          user_id: user,
-          parentDirectory: userSharedFilesDirectory._id,
-          files: idsOfDuplicatedFiles,
-          mimetype: "Shared",
-          secreteCode: randomString,
-        },
-      ],
-      { session }
+    const newDirectory = new CreateDirectoryObject(
+      name,
+      user,
+      userSharedFilesDirectory._id,
+      idsOfDuplicatedFiles,
+      "shared"
     );
+
+    const [sharedReference] = await Directory.create([newDirectory], {
+      session,
+    });
 
     userSharedFilesDirectory.subDirectories.push(sharedReference._id);
 
@@ -91,19 +91,12 @@ const shareDirectory = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { shareDirectory };
-
-
-
-
+module.exports =  shareDirectory ;
 
 // app.get('/user/:id', (req, res, next) => {
 //   console.log('ID:', req.params.id)
 //   next()
-// }, 
-
-
-
+// },
 
 // (req, res, next) => {
 //   res.send('User Info')

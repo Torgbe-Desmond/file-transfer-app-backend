@@ -16,13 +16,13 @@ router.post(
   protectRoutes,
   createFile
 );
+
 router.delete("/delete-files", protectRoutes, deleteFile);
+
 router.get("/:reference_Id/files", protectRoutes, getAllFiles);
-router.post(
-  "/:reference_Id/movefiles",
-  protectRoutes,
-  moveFiles,
-);
+
+router.post("/:reference_Id/movefiles", protectRoutes, moveFiles);
+
 router.get("/download/:fileId", protectRoutes, downloadFile);
 
 module.exports = router;

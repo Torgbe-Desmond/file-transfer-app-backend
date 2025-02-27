@@ -10,7 +10,7 @@ const getAllFiles = expressAsyncHandler(async (req, res) => {
   try {
     const userFiles = await File.find({ user_id });
 
-    const data = userFiles.map((item) => {
+    const allFiles = userFiles.map((item) => {
       const { _id, name, mimetype } = item;
       return {
         name,
@@ -19,14 +19,14 @@ const getAllFiles = expressAsyncHandler(async (req, res) => {
       };
     });
 
-    if (!data.length) {
+    if (!allFiles.length) {
       throw new NotFound("No files found for the user", true);
     }
 
     const responsObject = new SuccessResponse(
       true,
       null,
-      data
+      allFiles
     );
 
     res.status(StatusCodes.OK).json(responsObject);

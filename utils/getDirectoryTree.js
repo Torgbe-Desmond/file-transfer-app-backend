@@ -16,7 +16,7 @@ async function getDirectoryTree(directoryId, session) {
         if (files && files.length > 0) {
             directoryTree.filesToDelete.push(...files);
         }
-        
+            
         directoryTree.directoriesToDelete.push(directoryId);
 
         if (subDirectories && subDirectories.length > 0) {

@@ -18,7 +18,7 @@ const deleteFile = expressAsyncHandler(async (req, res) => {
   session.startTransaction();
 
   try {
-    let data = [];
+    let filesToDelete = [];
     let filesToBeDeletedImmediately = [];
 
     for (const fileId of fileIds) {
@@ -35,7 +35,7 @@ const deleteFile = expressAsyncHandler(async (req, res) => {
           if (!fileExisted.shared) {
             await deleteFileFromStorage(user_id, fileExisted.name);
           }
-          data.push(fileExisted._id);
+          filesToDelete.push(fileExisted._id);
       }
     }
 
@@ -48,8 +48,9 @@ const deleteFile = expressAsyncHandler(async (req, res) => {
     const fileDirectory = await Directory.findById(directoryId).session(
       session
     );
+
     if (fileDirectory) {
-      fileDirectory.files.pull(...data, ...filesToBeDeletedImmediately);
+      fileDirectory.files.pull(...filesToDelete, ...filesToBeDeletedImmediately);
       await fileDirectory.save({ session });
     }
 
@@ -57,8 +58,8 @@ const deleteFile = expressAsyncHandler(async (req, res) => {
 
     const responsObject = new SuccessResponse(
       true,
-      "File(s) deleted Succesfully",
-      data
+      `${fileIds.length} files deleted successfully`,
+      filesToDelete
     );
 
     res.status(StatusCodes.OK).json(responsObject);

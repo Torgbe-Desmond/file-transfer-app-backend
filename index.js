@@ -1,3 +1,4 @@
+"use strict";
 const { io, app, server  } = require('./socket/socket')
 const { connectMongoDB } = require('./config/db');
 const cors = require('cors');

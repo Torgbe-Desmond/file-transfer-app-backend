@@ -3,7 +3,8 @@ const sendMailToAdminIfCritical = require("../utils/sendMailToAdminIfCritical");
 
 class ErrorHandler {
   async handleError(err) {
-    await sendMailToAdminIfCritical(err);
+    // await sendMailToAdminIfCritical(err);
+     console.log(err)
   }
 
   isTrustedError(error) {

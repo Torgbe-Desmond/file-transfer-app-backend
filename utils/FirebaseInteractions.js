@@ -13,11 +13,8 @@ const {
   uploadBytes,
 } = require("firebase/storage");
 
-const File = require('../domains/file/model')
-const Directory = require('../domains/directory/model')
-const ErrorHandler = require('../Errors/ErrorHandler')
-const Handler = new ErrorHandler()
-
+const ErrorHandler = require("../Errors/ErrorHandler");
+const Handler = new ErrorHandler();
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -75,47 +72,6 @@ const uploadFileToStorage = async (user_id, file) => {
   }
 };
 
-// Function to upload mutiple files to group
-const uploadMultipleFilesToGroup = async (user_id, files) => {
-  try {
-    const fileUrls = [];
-    for (const file of files) {
-      const { originalname, mimetype, buffer } = file;
-      const fileUrl = await uploadFileToStorage(user_id, {
-        originalname,
-        mimetype,
-        buffer,
-      });
-      fileUrls.push(fileUrl);
-    }
-    return fileUrls;
-  } catch (error) {
-    console.error("Error uploading multiple files:", error);
-    if (!Handler.isTrustedError(error)) {
-      Handler.handleError(error);
-    }
-    throw error;
-  }
-};
-
-const uploadMultipleFilesToGroupV2 = async (user_id, file) => {
-  try {
-    const { originalname, mimetype, buffer } = file;
-    const fileUrl = await uploadFileToStorage(user_id, {
-      originalname,
-      mimetype,
-      buffer,
-    });
-    return fileUrl;
-  } catch (error) {
-    console.error("Error uploading multiple files:", error);
-    if (!Handler.isTrustedError(error)) {
-      Handler.handleError(error);
-    }
-    throw error;
-  }
-};
-
 // Function to delete a file from Firebase Storage
 const deleteFileFromStorage = async (user_id, filename) => {
   try {
@@ -137,34 +93,7 @@ const deleteFileFromStorage = async (user_id, filename) => {
   }
 };
 
-// Function to move files to user group
-const moveFileToUserGroup = async (user_id, filename) => {
-  try {
-    console.log("Uploading...");
-    const storageRef = ref(storage, `users/${user_id}/${filename}`);
-
-    const destinationRef = ref(storage, `users/${user_id}/shared/${filename}`);
-
-    const url = await getDownloadURL(storageRef);
-
-    const response = await fetch(url);
-
-    const blob = await response.blob();
-
-    await uploadBytes(destinationRef, blob);
-
-    const downloadURL = await getDownloadURL(destinationRef);
-    return downloadURL;
-  } catch (error) {
-    console.error("Error moving file:", error._baseMessage);
-    if (!Handler.isTrustedError(error)) {
-      Handler.handleError(error);
-    }
-    throw error;
-  }
-};
-
-// Function to move files to user group
+// Function to copy files from on user to another
 const copyFileFromOneUserToAnother = async (from, to, filename) => {
   try {
     const storageRef = ref(storage, `users/${from}/${filename}`);
@@ -194,40 +123,104 @@ const copyFileFromOneUserToAnother = async (from, to, filename) => {
   }
 };
 
-// Function to delete multiple files in a directory
-const deleteFilesInDirectory = async (user_id, fileIds, session) => {
-  try {
-    for (const fileId of fileIds) {
-      const fileExisted = await File.findByIdAndDelete(fileId, { session });
-      if (!fileExisted) {
-        continue;
-      }
+// Function to upload mutiple files to group
+// const uploadMultipleFilesToGroup = async (user_id, files) => {
+//   try {
+//     const fileUrls = [];
+//     for (const file of files) {
+//       const { originalname, mimetype, buffer } = file;
+//       const fileUrl = await uploadFileToStorage(user_id, {
+//         originalname,
+//         mimetype,
+//         buffer,
+//       });
+//       fileUrls.push(fileUrl);
+//     }
+//     return fileUrls;
+//   } catch (error) {
+//     console.error("Error uploading multiple files:", error);
+//     if (!Handler.isTrustedError(error)) {
+//       Handler.handleError(error);
+//     }
+//     throw error;
+//   }
+// };
 
-      const fileDirectory = await Directory.findById(
-        fileExisted.directoryId
-      ).session(session);
-      if (fileDirectory) {
-        fileDirectory.files.pull(fileId);
-        await fileDirectory.save();
-      }
+// const uploadMultipleFilesToGroupV2 = async (user_id, file) => {
+//   try {
+//     const { originalname, mimetype, buffer } = file;
+//     const fileUrl = await uploadFileToStorage(user_id, {
+//       originalname,
+//       mimetype,
+//       buffer,
+//     });
+//     return fileUrl;
+//   } catch (error) {
+//     console.error("Error uploading multiple files:", error);
+//     if (!Handler.isTrustedError(error)) {
+//       Handler.handleError(error);
+//     }
+//     throw error;
+//   }
+// };
 
-      await deleteFileFromStorage(user_id, fileExisted.originalname);
-    }
-  } catch (error) {
-    if (!Handler.isTrustedError(error)) {
-      Handler.handleError(error);
-    }
-    throw error;
-  }
-};
+// // Function to move files to user group
+// const moveFileToUserGroup = async (user_id, filename) => {
+//   try {
+//     console.log("Uploading...");
+//     const storageRef = ref(storage, `users/${user_id}/${filename}`);
+
+//     const destinationRef = ref(storage, `users/${user_id}/shared/${filename}`);
+
+//     const url = await getDownloadURL(storageRef);
+
+//     const response = await fetch(url);
+
+//     const blob = await response.blob();
+
+//     await uploadBytes(destinationRef, blob);
+
+//     const downloadURL = await getDownloadURL(destinationRef);
+//     return downloadURL;
+//   } catch (error) {
+//     console.error("Error moving file:", error._baseMessage);
+//     if (!Handler.isTrustedError(error)) {
+//       Handler.handleError(error);
+//     }
+//     throw error;
+//   }
+// };
+
+// // Function to delete multiple files in a directory
+// const deleteFilesInDirectory = async (user_id, fileIds, session) => {
+//   try {
+//     for (const fileId of fileIds) {
+//       const fileExisted = await File.findByIdAndDelete(fileId, { session });
+//       if (!fileExisted) {
+//         continue;
+//       }
+
+//       const fileDirectory = await Directory.findById(
+//         fileExisted.directoryId
+//       ).session(session);
+//       if (fileDirectory) {
+//         fileDirectory.files.pull(fileId);
+//         await fileDirectory.save();
+//       }
+
+//       await deleteFileFromStorage(user_id, fileExisted.originalname);
+//     }
+//   } catch (error) {
+//     if (!Handler.isTrustedError(error)) {
+//       Handler.handleError(error);
+//     }
+//     throw error;
+//   }
+// };
 
 // Export the functions for use in other modules
 module.exports = {
   uploadFileToStorage,
-  deleteFilesInDirectory,
   deleteFileFromStorage,
-  uploadMultipleFilesToGroupV2,
-  uploadMultipleFilesToGroup,
-  moveFileToUserGroup,
   copyFileFromOneUserToAnother,
 };

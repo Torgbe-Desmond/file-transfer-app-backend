@@ -11,7 +11,7 @@ const SuccessResponse = require("../../../utils/successResponse");
 const {default:mongoose} = require('mongoose')
 const Directory = require('../../directory/model')
 
-module.exports.registerUser = asyncHandler(async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -80,3 +80,6 @@ module.exports.registerUser = asyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+
+module.exports = registerUser

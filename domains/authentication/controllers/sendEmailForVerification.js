@@ -11,7 +11,7 @@ const SuccessResponse = require("../../../utils/successResponse");
 const generatePasswordVerificationToken = require("../../../utils/generatePasswordVerificationToken");
 const Handler = new ErrorHandler();
 
-module.exports.sendEmailForVerification = asyncHandler(async (req, res) => {
+const sendEmailForVerification = asyncHandler(async (req, res) => {
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -58,3 +58,5 @@ module.exports.sendEmailForVerification = asyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+module.exports = sendEmailForVerification

@@ -8,7 +8,7 @@ const BadRequest = require("../../../Errors/BadRequest");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.moveDirectories = expressAsyncHandler(async (req, res) => {
+const moveDirectories = expressAsyncHandler(async (req, res) => {
   const { directoriesToMove, directoryToMoveTo } = req.body;
 
   const session = await mongoose.startSession();
@@ -35,9 +35,9 @@ module.exports.moveDirectories = expressAsyncHandler(async (req, res) => {
       throw new NotFound("Target directory not found.", true);
     }
 
-    const directories = await Directory.find({
-      _id: { $in: directoriesToMove },
+    const directories = await Directory.find({ _id: { $in: directoriesToMove },
     }).session(session);
+
     if (directories.length !== directoriesToMove.length) {
       throw new NotFound(
         "One or more directories to move were not found.",
@@ -87,3 +87,6 @@ module.exports.moveDirectories = expressAsyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+
+module.exports = moveDirectories

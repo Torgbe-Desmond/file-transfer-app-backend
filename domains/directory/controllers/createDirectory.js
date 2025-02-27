@@ -2,19 +2,16 @@ const expressAsyncHandler = require("express-async-handler");
 const { StatusCodes } = require("http-status-codes");
 const ErrorHandler = require("../../../Errors/ErrorHandler");
 const BadRequest = require("../../../Errors/BadRequest");
-const NotFound = require("../../../Errors/Notfound"); 
+const NotFound = require("../../../Errors/Notfound");
 const { default: mongoose } = require("mongoose");
 const Directory = require("../model");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
+const createDirectory = expressAsyncHandler(async (req, res) => {
   const user_id = req.user;
   const { name } = req.body;
   const { directoryId: parentDirectory } = req.params;
-
-  console.log("name:", name);
-  console.log("user_id:", user_id);
 
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -24,7 +21,9 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
       throw new BadRequest("Parent directory ID is required", true);
     }
 
-    const directoryExist = await Directory.findById(parentDirectory).session(session);
+    const directoryExist = await Directory.findById(parentDirectory).session(
+      session
+    );
     if (!directoryExist) {
       throw new NotFound("Parent directory does not exist", true);
     }
@@ -36,31 +35,38 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
     }).setOptions({ session });
 
     if (existingDirectory) {
-      throw new BadRequest("A directory with the specified name already exists", true);
+      throw new BadRequest(
+        "A directory with the specified name already exists",
+        true
+      );
     }
 
-    const newDirectory = new Directory({ name, user_id, parentDirectory });
+    const newDirectory = new Directory({
+      name,
+      user_id,
+      parentDirectory,
+      status: true,
+    });
     await newDirectory.save({ session });
 
     directoryExist.subDirectories.push(newDirectory._id);
+
     await directoryExist.save({ session });
 
     await session.commitTransaction();
 
-    const data = {
-      _id: newDirectory._id,
-      name: newDirectory.name,
-      parentDirectory: newDirectory.parentDirectory,
-      user_id: newDirectory.user_id,
-      mimetype: newDirectory.mimetype,
-      size: newDirectory.size,
-      lastUpdated: newDirectory.lastUpdated,
-    };
-
     const responseObject = new SuccessResponse(
       true,
       "Folder created Successfully",
-      data
+      {
+        _id: newDirectory._id,
+        name: newDirectory.name,
+        parentDirectory: newDirectory.parentDirectory,
+        user_id: newDirectory.user_id,
+        mimetype: newDirectory.mimetype,
+        size: newDirectory.size,
+        lastUpdated: newDirectory.lastUpdated,
+      }
     );
 
     res.status(StatusCodes.CREATED).json(responseObject);
@@ -74,3 +80,6 @@ module.exports.createDirectory = expressAsyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+
+module.exports = createDirectory

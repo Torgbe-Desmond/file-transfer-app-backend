@@ -6,7 +6,7 @@ const User = require("../model");
 const SuccessResponse = require("../../../utils/successResponse");
 const BadRequest = require("../../../Errors/BadRequest");
 
-module.exports.generateTokenForVerification = asyncHandler(async (req, res) => {
+const generateTokenForVerification = asyncHandler(async (req, res) => {
   const { reference_Id } = req.params;
 
   if (!reference_Id) {
@@ -31,3 +31,5 @@ module.exports.generateTokenForVerification = asyncHandler(async (req, res) => {
 
   res.status(StatusCodes.OK).json(responsObject);
 });
+
+module.exports = generateTokenForVerification

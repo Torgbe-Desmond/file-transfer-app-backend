@@ -14,7 +14,7 @@ const NotFound = require("../../../Errors/Notfound");
 const SuccessResponse = require("../../../utils/successResponse");
 const Handler = new ErrorHandler();
 
-module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
+const deleteDirectory = expressAsyncHandler(async (req, res) => {
   const { directoryIds, parentDirectory } = req.body;
 
   const session = await mongoose.startSession();
@@ -94,7 +94,7 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
 
     const responsObject = new SuccessResponse(
       true,
-      "Folder deleted successfully",
+      `${directoryIds.length} folders deleted successfully`,
       data
     );
 
@@ -109,3 +109,5 @@ module.exports.deleteDirectory = expressAsyncHandler(async (req, res) => {
     session.endSession();
   }
 });
+
+module.exports = deleteDirectory
