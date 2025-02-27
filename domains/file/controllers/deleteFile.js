@@ -7,7 +7,7 @@ const File = require("../model");
 const {
   deleteFileFromStorage,
 } = require("../../../utils/FirebaseInteractions");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const deleteFile = expressAsyncHandler(async (req, res) => {

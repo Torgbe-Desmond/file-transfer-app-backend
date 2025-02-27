@@ -11,7 +11,7 @@ const {
   deleteFileFromStorage,
 } = require("../../../utils/FirebaseInteractions");
 const NotFound = require("../../../Errors/Notfound");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const deleteDirectory = expressAsyncHandler(async (req, res) => {

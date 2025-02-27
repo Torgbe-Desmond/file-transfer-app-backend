@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const ErrorHandler = require("../../../Errors/ErrorHandler");
 const Directory = require("../model");
 const NotFound = require("../../../Errors/Notfound");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const getAllDirectories = expressAsyncHandler(async (req, res) => {

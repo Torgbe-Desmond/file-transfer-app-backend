@@ -7,7 +7,7 @@ const NotFound = require("../../../Errors/Notfound");
 const {
   copyFileFromOneUserToAnother,
 } = require("../../../utils/FirebaseInteractions");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 const File = require('../../file/model')
 

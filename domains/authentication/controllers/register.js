@@ -7,7 +7,7 @@ const { v4: uuidv4 } = require("uuid");
 const generateToken = require("../../../utils/generateToken");
 const Handler = new ErrorHandler();
 const bcryptjs = require("bcryptjs");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const {default:mongoose} = require('mongoose')
 const Directory = require('../../directory/model')
 

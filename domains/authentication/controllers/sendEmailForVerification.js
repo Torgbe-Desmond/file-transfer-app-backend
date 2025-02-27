@@ -7,7 +7,7 @@ const { default: mongoose } = require("mongoose");
 const {
   sendEmaiToRecipient,
 } = require("../../../utils/nodemailerConfiguration");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const generatePasswordVerificationToken = require("../../../utils/generatePasswordVerificationToken");
 const Handler = new ErrorHandler();
 

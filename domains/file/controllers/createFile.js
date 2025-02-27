@@ -7,7 +7,7 @@ const File = require("../model");
 const NotFound = require("../../../Errors/Notfound");
 const { uploadFileToStorage } = require("../../../utils/FirebaseInteractions");
 const BadRequest = require("../../../Errors/BadRequest");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const CreateFileObject = require("../../../utils/createFileObject");
 const Handler = new ErrorHandler();
 
@@ -32,8 +32,10 @@ const createFile = expressAsyncHandler(async (req, res) => {
     let filesToInsert = [];
 
     for (const file of req.files) {
+      let isValidFile = false
       const fileUrl = await uploadFileToStorage(user_id, file);
-      const newFile = new CreateFileObject(file, user_id, fileUrl, directoryId);
+      if(fileUrl) isValidFile = true
+      const newFile = new CreateFileObject(file, user_id, fileUrl, directoryId, isValidFile);
       filesToInsert.push(newFile);
     }
 

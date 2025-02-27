@@ -1,6 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const { addToBlacklist } = require("../../../utils/blackList");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 
 const logout = async (req, res) => {
   try {

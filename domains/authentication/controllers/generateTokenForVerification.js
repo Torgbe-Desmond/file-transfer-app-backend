@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const NotFound = require("../../../Errors/Notfound");
 const User = require("../model");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const BadRequest = require("../../../Errors/BadRequest");
 
 const generateTokenForVerification = asyncHandler(async (req, res) => {

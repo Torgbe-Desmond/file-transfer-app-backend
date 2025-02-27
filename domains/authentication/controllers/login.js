@@ -6,7 +6,7 @@ const generateAuthToken = require('../../../utils/generateToken')
 const ErrorHandler = require('../../../Errors/ErrorHandler')
 const Handler = new ErrorHandler()
 const bcryptjs = require('bcryptjs');
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 
 const loginUser = asyncHandler(async (req, res) => {
   try {

@@ -5,7 +5,7 @@ const {
   combinedFilesAndDirectories,
 } = require("../../../utils/combinedFilesAndDirectories");
 const NotFound = require("../../../Errors/Notfound");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 
 const getAdirectory = expressAsyncHandler(async (req, res) => {
   try {

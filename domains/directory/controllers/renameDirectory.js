@@ -5,7 +5,7 @@ const { default: mongoose } = require("mongoose");
 const Directory = require("../model");
 const NotFound = require("../../../Errors/Notfound");
 const BadRequest = require("../../../Errors/BadRequest");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const renameDirectory = expressAsyncHandler(async (req, res) => {

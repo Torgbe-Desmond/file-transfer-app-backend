@@ -5,7 +5,7 @@ const User = require('../model');
 const ErrorHandler = require('../../../Errors/ErrorHandler');
 const BadRequest = require("../../../Errors/BadRequest");
 const { default: mongoose } = require("mongoose");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const { addToBlacklist } = require("../../../utils/blackList");
 const Handler = new ErrorHandler();
 

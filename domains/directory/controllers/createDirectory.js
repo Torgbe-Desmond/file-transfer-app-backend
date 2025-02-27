@@ -5,7 +5,7 @@ const BadRequest = require("../../../Errors/BadRequest");
 const NotFound = require("../../../Errors/Notfound");
 const { default: mongoose } = require("mongoose");
 const Directory = require("../model");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const createDirectory = expressAsyncHandler(async (req, res) => {
