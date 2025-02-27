@@ -6,7 +6,7 @@ const Handler = new ErrorHandler();
 const { default: mongoose } = require("mongoose");
 const Directory = require("../../directory/model");
 const { StatusCodes } = require("http-status-codes");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 
 const moveFiles = expressAsyncHandler(async (req, res) => {
   const { DirectoriesToMoveFileTo, FileIds, DirectoryFileIsMoveFrom } =

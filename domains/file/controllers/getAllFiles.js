@@ -2,7 +2,7 @@ const expressAsyncHandler = require("express-async-handler");
 const File = require("../model");
 const NotFound = require("../../../Errors/Notfound");
 const ErrorHandler = require("../../../Errors/ErrorHandler");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const Handler = new ErrorHandler();
 
 const getAllFiles = expressAsyncHandler(async (req, res) => {
