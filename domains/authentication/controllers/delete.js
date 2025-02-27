@@ -11,7 +11,7 @@ const {
 } = require("../../../utils/FirebaseInteractions");
 const ErrorHandler = require("../../../Errors/ErrorHandler");
 const asyncHandler = require("express-async-handler");
-const SuccessResponse = require("../../../utils/successResponse");
+const SuccessResponse = require("../../../utils/SuccessResponse");
 const User = require("../model");
 const Handler = new ErrorHandler();
 
