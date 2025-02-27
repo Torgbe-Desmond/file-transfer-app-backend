@@ -1,7 +1,7 @@
 const Directory = require("../../domains/directory/model");
 const NotFound = require("../../Errors/Notfound");
 const BadRequest = require("../../Errors/BadRequest");
-const SuccessResponse = require("../../../utils/SuccessResponse");
+const SuccessResponse = require("../../utils/SuccessResponse");
 const ErrorHandler = require("../../Errors/ErrorHandler");
 const File = require("../../domains/file/model");
 const { StatusCodes } = require("http-status-codes");
