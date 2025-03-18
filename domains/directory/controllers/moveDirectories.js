@@ -11,76 +11,61 @@ const Handler = new ErrorHandler();
 const moveDirectories = expressAsyncHandler(async (req, res) => {
   const { directoriesToMove, directoryToMoveTo } = req.body;
 
+  if (!Array.isArray(directoriesToMove) || directoriesToMove.length === 0) {
+    throw new BadRequest("No directories specified to move.", true);
+  }
+
+  if (!Array.isArray(directoryToMoveTo) || directoryToMoveTo.length !== 1) {
+    throw new BadRequest(
+      "There should be exactly one target directory to move the directories into.",
+      true
+    );
+  }
+
+  const targetDirectoryId = directoryToMoveTo[0];
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    if (!Array.isArray(directoriesToMove) || directoriesToMove.length === 0) {
-      throw new BadRequest("No directories specified to move.", true);
-    }
-
-    if (directoryToMoveTo.length !== 1) {
-      throw new BadRequest(
-        "There should be exactly one target directory to move the directories into.",
-        true
-      );
-    }
-
-    const targetDirectoryId = directoryToMoveTo[0];
-
-    const targetDirectory = await Directory.findById(targetDirectoryId).session(
-      session
-    );
+    const targetDirectory = await Directory.findById(targetDirectoryId).lean().session(session);
     if (!targetDirectory) {
       throw new NotFound("Target directory not found.", true);
     }
 
-    const directories = await Directory.find({ _id: { $in: directoriesToMove },
-    }).session(session);
+    const directories = await Directory.find({ _id: { $in: directoriesToMove } }).session(session);
 
     if (directories.length !== directoriesToMove.length) {
-      throw new NotFound(
-        "One or more directories to move were not found.",
-        true
-      );
+      throw new NotFound("One or more directories to move were not found.", true);
     }
 
-    let data = [];
+    let movedData = [];
 
     for (const directory of directories) {
-      await Directory.findOneAndUpdate(
-        { _id: directory._id },
-        { parentDirectory: targetDirectoryId },
-        { session }
-      );
+      await Directory.findByIdAndUpdate(directory._id, { parentDirectory: targetDirectoryId }, { session });
 
-      const parentDirectory = await Directory.findById(
-        directory.parentDirectory
-      );
-      if (parentDirectory) {
-        parentDirectory.subDirectories.pull(directory._id);
-        await parentDirectory.save({ session });
+      if (directory.parentDirectory) {
+        const parentDirectory = await Directory.findById(directory.parentDirectory).lean().session(session);
+        if (parentDirectory) {
+          parentDirectory.subDirectories.pull(directory._id);
+          await parentDirectory.save({ session });
+        }
       }
 
-      data.push(directory._id);
+      movedData.push(directory._id);
     }
 
-    targetDirectory.subDirectories.push(...data);
+    targetDirectory.subDirectories = [...new Set([...targetDirectory.subDirectories, ...movedData])];
     await targetDirectory.save({ session });
 
     await session.commitTransaction();
 
-    const responsObject = new SuccessResponse(
-      true,
-      "Folder(s) Moved Succesfully",
-      data
-    );
-
-    res.status(StatusCodes.CREATED).json(responsObject);
+    res.status(StatusCodes.CREATED).json(new SuccessResponse(true, "Folder(s) Moved Successfully", movedData));
   } catch (error) {
     await session.abortTransaction();
     if (!Handler.isTrustedError(error)) {
       Handler.handleError(error);
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ success: false, message: "Something went wrong." });
     }
     throw error;
   } finally {
@@ -88,5 +73,4 @@ const moveDirectories = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
-module.exports = moveDirectories
+module.exports = moveDirectories;

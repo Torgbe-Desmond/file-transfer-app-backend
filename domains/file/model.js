@@ -11,7 +11,7 @@ const fileSchema = new Schema({
   lastUpdated: { type: Date, default: Date.now },
   size: { type: Number, default: 0 },
   shared: { type: Boolean, default: false },
-  status: {type:Boolean, default:false}
+  status: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("File", fileSchema);

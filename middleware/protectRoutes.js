@@ -8,6 +8,7 @@ const Handler = new ErrorHandler();
 const protectRoutes = async (req, res, next) => {
   try {
     const header = req.headers?.authorization || req.headers?.Authorization;
+    // console.log("header", header);
     if (!header || !header.startsWith("Bearer ")) {
       throw new Unauthorized("Unauthorized", true);
     }

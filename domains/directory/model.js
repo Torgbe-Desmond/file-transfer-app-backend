@@ -13,6 +13,7 @@ const directorySchema = new Schema(
     size: { type: Number, default: 0 },
     status: { type: Boolean, default: false },
     secreteCode: { type: String },
+    public: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

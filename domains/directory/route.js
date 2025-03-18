@@ -4,21 +4,11 @@ const deleteDirectory = require("./controllers/deleteDirectory");
 const getAdirectory = require("./controllers/getAdirectory");
 const getAllDirectories = require("./controllers/getAllDirectories");
 const getAllDirForMoving = require("./controllers/getAllDirForMoving");
+const getBreadCrumb = require("./controllers/handleBreadCrumb");
 const moveDirectories = require("./controllers/moveDirectories");
 const receiveSharedFiles = require("./controllers/receiveSharedFiles");
 const renameDirectory = require("./controllers/renameDirectory");
 const shareDirectory = require("./controllers/shareDirectory");
-
-// console.log("✅ protectRoutes middleware loaded:", protectRoutes);
-// console.log("✅ createDirectory controller loaded:", createDirectory);
-// console.log("✅ deleteDirectory controller loaded:", deleteDirectory);
-// console.log("✅ getAdirectory controller loaded:", getAdirectory);
-// console.log("✅ getAllDirectories controller loaded:", getAllDirectories);
-// console.log("✅ getAllDirForMoving controller loaded:", getAllDirForMoving);
-// console.log("✅ moveDirectories controller loaded:", moveDirectories);
-// console.log("✅ receiveSharedFiles controller loaded:", receiveSharedFiles);
-// console.log("✅ renameDirectory controller loaded:", renameDirectory);
-// console.log("✅ shareDirectory controller loaded:", shareDirectory);
 
 const express = require("express");
 const router = express.Router();
@@ -35,6 +25,13 @@ router.post(
 
 // get list of directories for moving route
 router.get("/:reference_Id/directories/all", protectRoutes, getAllDirForMoving);
+
+// breadcrumb route
+router.get(
+  "/:reference_Id/bread-crumb/:directoryId",
+  protectRoutes,
+  getBreadCrumb
+);
 
 // delete directory route
 router.delete("/delete-directory", protectRoutes, deleteDirectory);

@@ -44,8 +44,6 @@ const deleteDirectory = expressAsyncHandler(async (req, res) => {
         session
       );
 
-      console.log('directoryTreeObject',directoryTreeObject)
-
       if (directoryTreeObject) {
         const parentDir = directoryTreeObject.directoriesToDelete.shift();
         rootDirectoriesInParentDirectory.push(parentDir);

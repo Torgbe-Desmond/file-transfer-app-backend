@@ -1,18 +1,16 @@
-const Directory = require("../../domains/directory/model");
-const NotFound = require("../../Errors/Notfound");
-const BadRequest = require("../../Errors/BadRequest");
-const SuccessResponse = require("../../utils/SuccessResponse");
-const ErrorHandler = require("../../Errors/ErrorHandler");
-const File = require("../../domains/file/model");
+const Directory = require("../../directory/model");
+const NotFound = require("../../../Errors/Notfound");
+const BadRequest = require("../../../Errors/BadRequest");
+const SuccessResponse = require("../../../utils/SuccessResponse");
+const ErrorHandler = require("../../../Errors/ErrorHandler");
+const File = require("../../file/model");
 const { StatusCodes } = require("http-status-codes");
-const UserSearch = require("./model");
 const expressAsyncHandler = require("express-async-handler");
 const Handler = new ErrorHandler();
 
-const search = expressAsyncHandler(async (req, res) => {
+const localSearch = expressAsyncHandler(async (req, res) => {
   try {
     const { searchTerm } = req.params;
-    const { user: userId } = req;
 
     if (!searchTerm) {
       throw new BadRequest("Please provide an item to search", true);
@@ -21,7 +19,10 @@ const search = expressAsyncHandler(async (req, res) => {
     // Search in Directory first
     let searchResults = await Directory.find({
       name: { $regex: searchTerm, $options: "i" },
-    });
+    })
+      .populate("subDirectories")
+      .populate("files")
+      .exec();
 
     // If no results in Directory, search in File
     if (searchResults.length === 0) {
@@ -35,14 +36,6 @@ const search = expressAsyncHandler(async (req, res) => {
       throw new NotFound(`No results found for: ${searchTerm}`, true);
     }
 
-    // Find the user's search document or create a new one
-    let userSearch = await UserSearch.findOne({ userId });
-    if (!userSearch) {
-      userSearch = new UserSearch({ userId });
-    }
-    // Add the new search term
-    await userSearch.addSearchTerm(searchTerm);
-
     // Success response
     res
       .status(StatusCodes.OK)
@@ -55,4 +48,4 @@ const search = expressAsyncHandler(async (req, res) => {
   }
 });
 
-module.exports = search;
+module.exports = localSearch;

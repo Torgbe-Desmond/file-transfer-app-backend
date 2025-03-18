@@ -5,6 +5,7 @@ function CreateFileObject(
   directoryId,
   size = null,
   shared = null,
+  status = false
 ) {
   this.name = file.originalname;
   this.mimetype = file.mimetype;
@@ -13,7 +14,8 @@ function CreateFileObject(
   this.directoryId = directoryId;
   this.user_id = user_id;
   this.url = fileUrl || file.url;
-  this.size = size || file.url;
+  this.size = size || file.size;
+  this.status = status
   this.shared = shared
 }
 
